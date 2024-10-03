@@ -1,6 +1,15 @@
+//
 import React, { forwardRef, useImperativeHandle } from "react";
 import { useForm } from "react-hook-form";
 import styled, { keyframes } from "styled-components";
+
+
+
+// Images
+import arcadeIcon from '../../assets/images/icon-arcade.svg'
+import advancedIcon from '../../assets/images/icon-advanced.svg'
+import proIcon from '../../assets/images/icon-pro.svg'
+
 
 const FormWithHook = forwardRef(({ onSubmit }, ref) => {
     const { register, handleSubmit, formState: { errors }, trigger } = useForm();
@@ -67,8 +76,10 @@ class Form extends React.Component {
 
         this.state = {
             pages: ['1-step', '2-step', '3-step', '4-step'],
-            stepActive: 2,
-            form_object: []
+            stepActive: 4,
+            selectedPlan: {},
+            planDuration: false,
+            addons: []
         };
 
         this.formRef = React.createRef();
@@ -84,9 +95,9 @@ class Form extends React.Component {
     handleNextStep = () => {
         const { stepActive } = this.state;
         if (stepActive === 1) {
-            const isValid = async () => await this.formRef.current.validateForm();
-            if (!isValid) {
-                return;
+            const isValid = this.formRef.current.validateForm();
+            if (isValid) {
+                console.log('Validando o form inicial... ', isValid);
             }
         } else if (stepActive === 4) {
             console.log('Formulário enviado')
@@ -97,6 +108,45 @@ class Form extends React.Component {
         if (stepActive < this.state.pages.length) {
             console.log(stepActive);
             this.setState({ stepActive: stepActive + 1 });
+        }
+    }
+
+    handlePlan = (selectedPlan) => {
+        console.log(selectedPlan)
+        if (this.state.selectedPlan.name === selectedPlan.name) {
+            this.setState({
+                selectedPlan:{}
+        })
+        } else {
+            this.setState({
+                selectedPlan: selectedPlan
+            });
+        }
+    }
+
+    handleAddons = (addons) => {
+        if (this.state.addons.find(a => a.name === addons.name)) {
+            this.setState((prevState) => ({
+                addons: prevState.addons.filter(addon => addon.name !== addons.name)
+            }))
+        }
+        else {
+            this.setState((prevState) => ({
+                addons: [...prevState.addons, addons]
+            }))
+        }
+    }
+
+    handlePrint = (e) => {
+        if (e.target.checked){
+            this.setState({
+                planDuration:true
+            })
+        }
+        else {
+            this.setState({
+                planDuration:false
+            })
         }
     }
 
@@ -158,61 +208,126 @@ class Form extends React.Component {
                         <h1 className="title-description">Select Plan</h1>
                         <h3 className="subtitle-description">You have the option of monthly or yearly billing.</h3>
                         <div className="select-plan-description">
-                            <div className="plan-option">
-                                <img src="" alt="arcade" />
+                            <div className={`plan-option ${this.state.selectedPlan.name === 'Arcade' ? 'checked':''}`} onClick={() => {
+                                if (this.state.planDuration === false){
+                                    return this.handlePlan({name:'Arcade',price:9})
+                                }
+                                else {
+                                    return this.handlePlan({name:'Arcade',price:90})
+                                }
+                            }}>
+                                <img src={arcadeIcon} alt="Arcade" />
                                 <p className="plan-name">Arcade</p>
-                                <p className="price-description-arcade">9$/mon</p>
+                                <p className="price-description-plan">{this.state.planDuration ? '90$/Year': '9$/Mon'}</p>
                             </div>
-                            <div className="plan-option">
-
-                                <img src="" alt="Advanced" />
+                            <div className={`plan-option ${this.state.selectedPlan.name === 'Advanced' ? 'checked':''}`} onClick={() => {
+                                if (this.state.planDuration === false){
+                                    return this.handlePlan({name:'Advanced',price:12})
+                                }
+                                else {
+                                    return this.handlePlan({name:'Advanced',price:120})
+                                }
+                            }}>
+                                <img src={advancedIcon} alt="Advanced" />
                                 <p className="plan-name">Advanced</p>
-                                <p className="price-description-advanced">12$/mon</p>
+                                <p className="price-description-plan">{this.state.planDuration ? '120$/Year':'12$/Mon'}</p>
                             </div>
-                            <div className="plan-option">
-
-                                <img src="" alt="Pro" />
+                            <div className={`plan-option ${this.state.selectedPlan.name === 'Pro' ? 'checked':''}`} onClick={() => {
+                                if (this.state.planDuration === false){
+                                    return this.handlePlan({name:'Pro',price:15})
+                                }
+                                else {
+                                    return this.handlePlan({name:'Pro',price:150})
+                                }
+                            }}>
+                                <img src={proIcon} alt="Pro" />
                                 <p className="plan-name">Pro</p>
-                                <p className="price-description-pro">15$/mon</p>
+                                <p className="price-description-plan">{this.state.planDuration ? '150$/Year':'15$/Mon'}</p>
                             </div>
                             <div className="plan-duration">
                                 <span className="switch-label-month">Monthly</span>
                                 <label className="switch-toggle">
-                                    <input type="checkbox" id="toggle" />
+                                    <input type="checkbox" id="toggle" onClick={(e) => this.handlePrint(e)} />
                                     <span className="slider"></span>
                                 </label>
                                 <span className="switch-label-year">Yearly</span>
                             </div>
                         </div>
-
                     </div>
                     <div key='3' className={`add-ons ${this.state.stepActive === 3 ? 'form-step enabled' : 'form-step disabled'}`}>
                         <h1 className="title-description">Pick add-ons</h1>
                         <h3 className="subtitle-description">Add-ons help enhance your gaming experience.</h3>
                         <div className="addons-description">
-                            <div className="add-on-option">
-                                <div className="add-on-info">
-                                    <p className="addon-service">Online service</p>
-                                    <p className="addon-service-description">Access to multiplayer games</p>
+                            <label htmlFor="addon 1">
+                                <div className={`add-on-option ${this.state.addons.length > 0 ? this.state.addons.map((addon) => {
+                                    if (addon.name === 'Online service'){
+                                        return 'checked'
+                                    }
+                                    else {
+                                        return null
+                                    }
+                                }):''}`}>
+                                    <input type="checkbox" id="addon 1" onClick={() => {
+                                        if (this.state.planDuration){
+                                            return this.handleAddons({name:'Online service',price:10})
+                                        } else {
+                                            return this.handleAddons({name:'Online service',price:1})
+                                        }
+                                    }} />
+                                    <div className="add-on-info">
+                                        <p className="addon-service">Online service</p>
+                                        <p className="addon-service-description">Access to multiplayer games</p>
+                                    </div>
+                                    <p className="price-description-addon">{this.state.planDuration ? '10$/yr':'1$/mo'}</p>
                                 </div>
-                                <p className="price-description-addon">+$1/mo</p>
-                            </div>
-                            <div className="add-on-option">
-                                <div className="add-on-info">
-                                    <p className="addon-service">Larger storage</p>
-                                    <p className="addon-service-description">Extra 1TB of cloud save</p>
+                            </label>
+                            <label htmlFor="addon 2">
+                                <div className={`add-on-option ${this.state.addons.length > 0 ? this.state.addons.map((addon) => {
+                                    if (addon.name === 'Larger storage'){
+                                        return 'checked'
+                                    }
+                                    else {
+                                        return null
+                                    }
+                                }):''}`}>
+                                    <input type="checkbox" id="addon 2" onClick={() => {
+                                        if (this.state.planDuration){
+                                            return this.handleAddons({name:'Larger Storage',price:20})
+                                        } else {
+                                            return this.handleAddons({name:'Larger Storage',price:2})
+                                        }
+                                    }} />
+                                    <div className="add-on-info">
+                                        <p className="addon-service">Larger storage</p>
+                                        <p className="addon-service-description">Extra 1TB of cloud save</p>
+                                    </div>
+                                    <p className="price-description-addon">{this.state.planDuration ? '20$/yr':'2$/mo'}</p>
                                 </div>
-                                <p className="price-description-addon">+$2/mo</p>
-                            </div>
-                            <div className="add-on-option">
-                                <div className="add-on-info">
-                                    <p className="addon-service">Customizable Profile</p>
-                                    <p className="addon-service-description">Custom theme in your profile</p>
+                            </label>
+                            <label htmlFor="addon 3">
+                                <div className={`add-on-option ${this.state.addons.length > 0 ? this.state.addons.map((addon) => {
+                                    if (addon.name === 'Customizable profile'){
+                                        return 'checked'
+                                    }
+                                    else {
+                                        return null
+                                    }
+                                }):''}`}>
+                                    <input type="checkbox" id="addon 3" onClick={() => {
+                                        if (this.state.planDuration){
+                                            return this.handleAddons({name:'Customizable profile',price:20})
+                                        } else {
+                                            return this.handleAddons({name:'customizable-profile',price:2})
+                                        }
+                                    }} />
+                                    <div className="add-on-info">
+                                        <p className="addon-service">Customizable Profile</p>
+                                        <p className="addon-service-description">Custom theme in your profile</p>
+                                    </div>
+                                    <p className="price-description-addon">{this.state.planDuration ? '20$/yr':'2$/mo'}</p>
                                 </div>
-                                <p className="price-description-addon">+$2/mo</p>
-                            </div>
+                            </label>
                         </div>
-
                     </div>
                     <div key='4' className={`summary ${this.state.stepActive === 4 ? 'form-step enabled' : 'form-step disabled'}`}>
                         <h1 className="title-description">Finishing up</h1>
@@ -220,32 +335,33 @@ class Form extends React.Component {
                         <div className="summary-description">
                             <div className="main-plan">
                                 <div className="change-plan">
-                                    <p>Quadrado - Criar um estado para os planos</p>
-                                    <a href="/"><p className="btn-change-plan">Change</p></a>
+                                    <p className="plan-name">{this.state.selectedPlan.name}</p>
+                                    <p className="btn-change-plan" onClick={() => {
+                                        this.setState({stepActive:2})
+                                    }}>Change</p>
                                 </div>
-                                <p className="price-plan">9$</p>
+                                <p className="price-plan">{this.state.selectedPlan.price}$</p>
                             </div>
                             <div className="other-services">
-                                <p>Quadrado - Criar um estado para os serviços adicionais</p>
-                                <p>Pode ter mais de um serviço adicional</p>
+                                {this.state.addons.length > 0 ? this.state.addons.map((addon,index) => (<div className="service"><p key={index}>{addon.name}</p><p>+${addon.price}/yr</p></div>)):'Nenhum addon'}
                             </div>
                         </div>
                         <div className="total-billing">
-                            <p>Preço total: soma dos preços total + serviços adicionais</p>
+                            <p>Total {this.state.planDuration ? '(Per Year)':'(Per Month)'} = ${this.state.addons.length > 0 ? this.state.addons.reduce((acc, addon) => acc + addon.price, 0) + this.state.selectedPlan.price :this.state.selectedPlan.price}</p>
                         </div>
                     </div>
-                    <div className="form-navigation">
-                        <button className={`btn-nav ${this.state.stepActive === 1 ? 'btn-backstep disabled' : 'btn-backstep'}`} onClick={(e) => {
-                            e.preventDefault();
-                            this.handleBackStep();
-                        }}>Go Back</button>
-
-                        <button className="btn-nav btn-nextstep" onClick={(e) => {
-                            e.preventDefault();
-                            this.handleNextStep();
-                        }}>Next Step</button>
-                    </div>
                 </FormBar>
+                <div className="form-navigation">
+                    <button className={`btn-nav ${this.state.stepActive === 1 ? 'btn-backstep disabled' : 'btn-backstep'}`} onClick={(e) => {
+                        e.preventDefault();
+                        this.handleBackStep();
+                    }}>Go Back</button>
+
+                    <button className="btn-nav btn-nextstep" onClick={(e) => {
+                        e.preventDefault();
+                        this.handleNextStep();
+                    }}>{this.state.stepActive === 4 ? 'Confirm' : 'Next step'}</button>
+                </div>
             </FormCard>
         </Container >
 
@@ -268,15 +384,20 @@ const Container = styled.section`
 const FormCard = styled.div`
     display:grid;
     grid-template-columns: 40% 1fr;
-    grid-template-areas: "side-bar form";
+    grid-template-areas: "side-bar form"
+                         "side-bar navigation";
     //justify-content:center;
     //flex-direction:column;
-    align-items:center;
+    //align-items:center;
     width:800px;
     height:600px;
     background-color:white;
     border-radius: 20px;
     font-size:12px;
+
+    
+    font-family:'Ubuntu Regular';
+
 
     .form {
         grid-area:form;
@@ -285,6 +406,7 @@ const FormCard = styled.div`
         padding:20px;
         width:350px;
         margin-left:40px;
+        margin-top:50px;
     }
 
     .form-step.enabled{
@@ -295,10 +417,54 @@ const FormCard = styled.div`
         display:none;
     }
 
+    .form-navigation {
+        grid-area:navigation;
+        display:flex;
+        justify-content:flex-end;
+        align-items:flex-end;
+        width:100%;
+        transform:translate(-70px,-50px);
+        //justify-self:flex-end;
+    }
+
+    .btn-nav {
+        border-radius:7px;
+        border:0;
+        font-size:14px;
+        font-weight:bold;
+        width:100px;
+        height:40px;
+    }
+
+    .btn-nextstep {
+        width:100px;
+        height:40px;
+        background-color:#1d2e54;
+        color:white;
+        margin-left:150px;
+    }
+
+    .btn-nextstep:hover {
+        background-color:#41527C;
+        border-radius7px;
+    }
+
+    .btn-backstep {
+        background-color:white;
+        color:lightgrey;
+    }
+
+    .btn-backstep:hover {
+        color:#1d2e54;
+    }
+
+    .btn-backstep.disabled {
+        display:none;
+    }
+
     
 `
 const FormBar = styled.div`
-
 
     label.description-field {
         display:flex;
@@ -311,6 +477,10 @@ const FormBar = styled.div`
         font-weight:bold;
         display:none;
         margin:0;
+    }
+
+    .field:hover {
+        cursor:pointer;
     }
 
     .title-description {
@@ -370,6 +540,18 @@ const FormBar = styled.div`
         margin:10px;
         border:1px solid #F0F0F0;
         border-radius:10px;
+        padding:10px;
+        transition:border 0.2s ease-in-out;
+    }
+
+    .plan-option.checked {
+        border:1px solid blue;
+    }
+
+    .plan-option:hover {
+        cursor:pointer;
+        border: 1px solid blue;
+        
     }
 
     .plan-duration {
@@ -389,7 +571,7 @@ const FormBar = styled.div`
 
     .switch-toggle {
         margin: 0 20px;
-        width:50px;
+        width:51px;
         height:25px;
         //align-self:center;
         position:relative;
@@ -446,21 +628,48 @@ const FormBar = styled.div`
         width:100%;
         height:60px;
         display:grid;
-        grid-template-columns: 80% 20%;
-        grid-template-areas: "info addon-price";
+        grid-template-columns: 5% 75% 20%;
+        grid-template-areas: "checked info addon-price";
         align-items:center;
         padding:10px;
         font-size:18px;
         border: 1px solid lightgrey;
         border-radius:10px;
         margin-top:15px;
+        cursor:pointer;
+        transition:border 0.2s ease-in-out;
+    }
+
+    .add-on-option input {
+        grid-area: checked;
+        cursor:pointer;
+    }
+
+    .add-on-option.checked {
+        border: 1px solid blue;
+    }
+
+    .add-on-option:hover {
+        border: 1px solid blue;
+    }
+
+    .addon-service {
+        font-weight:bold;
+    }
+
+    .addon-service-description {
+        color:lightgrey;
     }
 
     .addon-on-info {
         grid-area: info;
     }
 
-    .price-description-option {
+    .add-on-info p {
+        margin-left:15px;
+    }
+
+    .price-description-addon {
         grid-area: addon-price;
         width:fit-content;
     }
@@ -468,6 +677,7 @@ const FormBar = styled.div`
     .summary-description {
         background-color:#F0F0F0;
         padding:20px;
+        
     }
 
     .summary-description, .total-billing {
@@ -496,63 +706,38 @@ const FormBar = styled.div`
        //margin-bottom:20px;
     }
 
+    .btn-change-plan {
+        cursor:pointer;    
+        width:fit-content;
+        text-decoration-line:underline;
+        text-decoration-color: blue;
+    }
+
     .price-plan {
         grid-area:price;
         justify-self:end;
     }
 
     .other-services {
+        display:flex;
+        flex-direction:column;
         margin-top:20px;
         border-top: 1px solid black;
+    }
+
+    .other-services .service {
+        display:flex;
+        justify-content:space-between;
+        margin: 10px 0;
     }
 
     .total-billing {
         padding:20px;
     }
 
-    .form-navigation {
-        margin-top:100px;
-        display:flex;
-        //justify-content:flex-end;
-        align-items:center;
-        width:100%;
-    }
+    
 
-    .btn-nav {
-        border-radius:7px;
-        border:0;
-        font-size:14px;
-        font-weight:bold;
-    }
-
-    .btn-nextstep {
-        width:100px;
-        height:40px;
-        background-color:#1d2e54;
-        color:white;
-        margin-left:auto;
-    }
-
-    .btn-nextstep:hover {
-        background-color:#41527C;
-        border-radius7px;
-    }
-
-    .btn-backstep {
-        height:fit-content;
-        width:70px;
-        background-color:white;
-        //margin-right:200px;
-        color:lightgrey;
-    }
-
-    .btn-backstep:hover {
-        color:#1d2e54;
-    }
-
-    .btn-backstep.disabled {
-        display:none;
-    }
+    
 `
 const SideBar = styled.div`
     display:flex;
@@ -562,7 +747,13 @@ const SideBar = styled.div`
     .image-side {
         position:relative;
         display:flex;
-        
+
+    }
+
+    .image-side img {
+        width:100%;
+        height:90%;
+        align-self:center;
     }
 
     .image-side .steps {
@@ -571,7 +762,7 @@ const SideBar = styled.div`
         flex-direction:column;
         color:white;
         //left:50%;
-        transform:translate(0,10%);
+        transform:translate(0,25%);
     }
 
     .step {
