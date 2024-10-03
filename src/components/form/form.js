@@ -1,5 +1,5 @@
 //
-import React, { forwardRef, useImperativeHandle } from "react";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
 import { useForm } from "react-hook-form";
 import styled, { keyframes } from "styled-components";
 
@@ -69,307 +69,290 @@ const FormWithHook = forwardRef(({ onSubmit }, ref) => {
     )
 });
 
-class Form extends React.Component {
+const Form = () => {
 
-    constructor(props) {
-        super(props);
+    const [formInfo, setFormInfo] = useState({
+        stepActive: 1,
+        selectedPlan:{name:null,price:null},
+        planDuration:false,
+        addons:[]
+    })
 
-        this.state = {
-            pages: ['1-step', '2-step', '3-step', '4-step'],
-            stepActive: 4,
-            selectedPlan: {},
-            planDuration: false,
-            addons: []
-        };
-
-        this.formRef = React.createRef();
-    }
-
-    handleBackStep = () => {
-        const { stepActive } = this.state;
-        if (stepActive <= this.state.pages.length) {
-            this.setState({ stepActive: stepActive - 1 });
+    const handleBackStep = () => {
+        if (formInfo.stepActive <= 4) {
+            setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive - 1 }));
         }
     }
 
-    handleNextStep = () => {
-        const { stepActive } = this.state;
-        if (stepActive === 1) {
-            const isValid = this.formRef.current.validateForm();
-            if (isValid) {
-                console.log('Validando o form inicial... ', isValid);
-            }
-        } else if (stepActive === 4) {
-            console.log('Formulário enviado')
+    const handleNextStep = () => {
+        if (formInfo.stepActive === 1) {
+            //Validar forms
+            console.log('Validar forms');
+            setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
+        } else if (formInfo.stepActive === 4) {
+            console.log('Formulário enviado');
         } else {
-            this.setState({ stepActive: stepActive + 1 })
-        }
-
-        if (stepActive < this.state.pages.length) {
-            console.log(stepActive);
-            this.setState({ stepActive: stepActive + 1 });
+            setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
         }
     }
 
-    handlePlan = (selectedPlan) => {
-        console.log(selectedPlan)
-        if (this.state.selectedPlan.name === selectedPlan.name) {
-            this.setState({
-                selectedPlan:{}
-        })
+    const handlePlan = (selectedPlan) => {
+        if (formInfo.selectedPlan.name === selectedPlan.name) {
+            setFormInfo((prevState) => ({
+                ...prevState,
+                selectedPlan: {name:null,price:null}
+            }))
         } else {
-            this.setState({
+            setFormInfo((prevState) => ({
+                ...prevState,
                 selectedPlan: selectedPlan
-            });
+            }));
         }
     }
 
-    handleAddons = (addons) => {
-        if (this.state.addons.find(a => a.name === addons.name)) {
-            this.setState((prevState) => ({
-                addons: prevState.addons.filter(addon => addon.name !== addons.name)
+
+    const handleAddons = (addons) => {
+        if (formInfo.addons.find(a => a.name === addons.name)) {
+            setFormInfo((prevState) => ({
+                ...prevState, addons: formInfo.addons.filter(addon => addon.name !== addons.name)
             }))
         }
         else {
-            this.setState((prevState) => ({
-                addons: [...prevState.addons, addons]
+            setFormInfo((prevState) => ({
+                ...prevState, addons: [addons]
             }))
         }
     }
 
-    handlePrint = (e) => {
-        if (e.target.checked){
-            this.setState({
-                planDuration:true
-            })
+    const handlePrint = (e) => {
+        if (e.target.checked) {
+            setFormInfo((prevState) => ({
+                ...prevState, planDuration: true
+            }))
         }
         else {
-            this.setState({
-                planDuration:false
-            })
+            setFormInfo((prevState) => ({
+                ...prevState, planDuration: false
+            }))
         }
+        console.log(formInfo.selectedPlan)
     }
 
-    handleSubmit = () => {
+    
+    const handleSubmit = () => {
         console.log('Formulário: Submit')
-        this.setState({ stepActive: 1 })
+        setFormInfo({ stepActive: 1 })
     }
 
 
-    render() {
-        return <Container>
-            <FormCard className="main-box">
-                <SideBar className="sidebar">
-                    <div className="image-side">
-                        <img src="/images/bg-sidebar-desktop.svg" alt="Side bar" />
-                        <div className="steps">
-                            <div className="step">
-                                <p className={`${this.state.stepActive === 1 ? 'numbers active' : 'numbers'}`}>1</p>
-                                <div className="step-content">
-                                    <p className="step-name">Step 1</p>
-                                    <p className="description-step">Your info</p>
-                                </div>
-                            </div>
-                            <br />
-                            <div className="step">
-                                <p className={`${this.state.stepActive === 2 ? 'numbers active' : 'numbers'}`}>2</p>
-                                <div className="step-content">
-                                    <p className="step-name">Step 2</p><p className="description-step">Select Plan</p>
-                                </div>
-                            </div>
-                            <br />
-                            <div className="step">
-                                <p className={`${this.state.stepActive === 3 ? 'numbers active' : 'numbers'}`}>3</p>
-                                <div className="step-content">
-                                    <p className="step-name">Step 3</p><p className="description-step">Add-ons</p>
-                                </div>
-                            </div>
-                            <br />
-                            <div className="step">
-                                <p className={`${this.state.stepActive === 4 ? 'numbers active' : 'numbers'}`}>4</p>
-                                <div className="step-content">
-                                    <p className="step-name">Step 4</p><p className="description-step">Summary</p>
-                                </div>
-                            </div>
-                            <br />
-                        </div>
-                    </div>
-                </SideBar>
-                <FormBar className="form">
-                    <div key='1' className={`your-info ${this.state.stepActive === 1 ? 'form-step enabled' : 'form-step disabled'}`}>
-
-                        <h1 className="title-description">Personal info</h1>
-                        <h3 className="subtitle-description">Please, provide your name, email adress and phone number.</h3>
-
-                        <FormWithHook ref={this.formRef} />
-
-                    </div>
-                    <div key='2' className={`select-plan ${this.state.stepActive === 2 ? 'form-step enabled' : 'form-step disabled'}`}>
-                        <h1 className="title-description">Select Plan</h1>
-                        <h3 className="subtitle-description">You have the option of monthly or yearly billing.</h3>
-                        <div className="select-plan-description">
-                            <div className={`plan-option ${this.state.selectedPlan.name === 'Arcade' ? 'checked':''}`} onClick={() => {
-                                if (this.state.planDuration === false){
-                                    return this.handlePlan({name:'Arcade',price:9})
-                                }
-                                else {
-                                    return this.handlePlan({name:'Arcade',price:90})
-                                }
-                            }}>
-                                <img src={arcadeIcon} alt="Arcade" />
-                                <p className="plan-name">Arcade</p>
-                                <p className="price-description-plan">{this.state.planDuration ? '90$/Year': '9$/Mon'}</p>
-                            </div>
-                            <div className={`plan-option ${this.state.selectedPlan.name === 'Advanced' ? 'checked':''}`} onClick={() => {
-                                if (this.state.planDuration === false){
-                                    return this.handlePlan({name:'Advanced',price:12})
-                                }
-                                else {
-                                    return this.handlePlan({name:'Advanced',price:120})
-                                }
-                            }}>
-                                <img src={advancedIcon} alt="Advanced" />
-                                <p className="plan-name">Advanced</p>
-                                <p className="price-description-plan">{this.state.planDuration ? '120$/Year':'12$/Mon'}</p>
-                            </div>
-                            <div className={`plan-option ${this.state.selectedPlan.name === 'Pro' ? 'checked':''}`} onClick={() => {
-                                if (this.state.planDuration === false){
-                                    return this.handlePlan({name:'Pro',price:15})
-                                }
-                                else {
-                                    return this.handlePlan({name:'Pro',price:150})
-                                }
-                            }}>
-                                <img src={proIcon} alt="Pro" />
-                                <p className="plan-name">Pro</p>
-                                <p className="price-description-plan">{this.state.planDuration ? '150$/Year':'15$/Mon'}</p>
-                            </div>
-                            <div className="plan-duration">
-                                <span className="switch-label-month">Monthly</span>
-                                <label className="switch-toggle">
-                                    <input type="checkbox" id="toggle" onClick={(e) => this.handlePrint(e)} />
-                                    <span className="slider"></span>
-                                </label>
-                                <span className="switch-label-year">Yearly</span>
+    return <Container>
+        <FormCard className="main-box">
+            <SideBar className="sidebar">
+                <div className="image-side">
+                    <img src="/images/bg-sidebar-desktop.svg" alt="Side bar" />
+                    <div className="steps">
+                        <div className="step">
+                            <p className={`${formInfo.stepActive === 1 ? 'numbers active' : 'numbers'}`}>1</p>
+                            <div className="step-content">
+                                <p className="step-name">Step 1</p>
+                                <p className="description-step">Your info</p>
                             </div>
                         </div>
-                    </div>
-                    <div key='3' className={`add-ons ${this.state.stepActive === 3 ? 'form-step enabled' : 'form-step disabled'}`}>
-                        <h1 className="title-description">Pick add-ons</h1>
-                        <h3 className="subtitle-description">Add-ons help enhance your gaming experience.</h3>
-                        <div className="addons-description">
-                            <label htmlFor="addon 1">
-                                <div className={`add-on-option ${this.state.addons.length > 0 ? this.state.addons.map((addon) => {
-                                    if (addon.name === 'Online service'){
-                                        return 'checked'
-                                    }
-                                    else {
-                                        return null
-                                    }
-                                }):''}`}>
-                                    <input type="checkbox" id="addon 1" onClick={() => {
-                                        if (this.state.planDuration){
-                                            return this.handleAddons({name:'Online service',price:10})
-                                        } else {
-                                            return this.handleAddons({name:'Online service',price:1})
-                                        }
-                                    }} />
-                                    <div className="add-on-info">
-                                        <p className="addon-service">Online service</p>
-                                        <p className="addon-service-description">Access to multiplayer games</p>
-                                    </div>
-                                    <p className="price-description-addon">{this.state.planDuration ? '10$/yr':'1$/mo'}</p>
-                                </div>
-                            </label>
-                            <label htmlFor="addon 2">
-                                <div className={`add-on-option ${this.state.addons.length > 0 ? this.state.addons.map((addon) => {
-                                    if (addon.name === 'Larger storage'){
-                                        return 'checked'
-                                    }
-                                    else {
-                                        return null
-                                    }
-                                }):''}`}>
-                                    <input type="checkbox" id="addon 2" onClick={() => {
-                                        if (this.state.planDuration){
-                                            return this.handleAddons({name:'Larger Storage',price:20})
-                                        } else {
-                                            return this.handleAddons({name:'Larger Storage',price:2})
-                                        }
-                                    }} />
-                                    <div className="add-on-info">
-                                        <p className="addon-service">Larger storage</p>
-                                        <p className="addon-service-description">Extra 1TB of cloud save</p>
-                                    </div>
-                                    <p className="price-description-addon">{this.state.planDuration ? '20$/yr':'2$/mo'}</p>
-                                </div>
-                            </label>
-                            <label htmlFor="addon 3">
-                                <div className={`add-on-option ${this.state.addons.length > 0 ? this.state.addons.map((addon) => {
-                                    if (addon.name === 'Customizable profile'){
-                                        return 'checked'
-                                    }
-                                    else {
-                                        return null
-                                    }
-                                }):''}`}>
-                                    <input type="checkbox" id="addon 3" onClick={() => {
-                                        if (this.state.planDuration){
-                                            return this.handleAddons({name:'Customizable profile',price:20})
-                                        } else {
-                                            return this.handleAddons({name:'customizable-profile',price:2})
-                                        }
-                                    }} />
-                                    <div className="add-on-info">
-                                        <p className="addon-service">Customizable Profile</p>
-                                        <p className="addon-service-description">Custom theme in your profile</p>
-                                    </div>
-                                    <p className="price-description-addon">{this.state.planDuration ? '20$/yr':'2$/mo'}</p>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    <div key='4' className={`summary ${this.state.stepActive === 4 ? 'form-step enabled' : 'form-step disabled'}`}>
-                        <h1 className="title-description">Finishing up</h1>
-                        <h3 className="subtitle-description">Double check everything looks OK before confirming.</h3>
-                        <div className="summary-description">
-                            <div className="main-plan">
-                                <div className="change-plan">
-                                    <p className="plan-name">{this.state.selectedPlan.name}</p>
-                                    <p className="btn-change-plan" onClick={() => {
-                                        this.setState({stepActive:2})
-                                    }}>Change</p>
-                                </div>
-                                <p className="price-plan">{this.state.selectedPlan.price}$</p>
-                            </div>
-                            <div className="other-services">
-                                {this.state.addons.length > 0 ? this.state.addons.map((addon,index) => (<div className="service"><p key={index}>{addon.name}</p><p>+${addon.price}/yr</p></div>)):'Nenhum addon'}
+                        <br />
+                        <div className="step">
+                            <p className={`${formInfo.stepActive === 2 ? 'numbers active' : 'numbers'}`}>2</p>
+                            <div className="step-content">
+                                <p className="step-name">Step 2</p><p className="description-step">Select Plan</p>
                             </div>
                         </div>
-                        <div className="total-billing">
-                            <p>Total {this.state.planDuration ? '(Per Year)':'(Per Month)'} = ${this.state.addons.length > 0 ? this.state.addons.reduce((acc, addon) => acc + addon.price, 0) + this.state.selectedPlan.price :this.state.selectedPlan.price}</p>
+                        <br />
+                        <div className="step">
+                            <p className={`${formInfo.stepActive === 3 ? 'numbers active' : 'numbers'}`}>3</p>
+                            <div className="step-content">
+                                <p className="step-name">Step 3</p><p className="description-step">Add-ons</p>
+                            </div>
                         </div>
+                        <br />
+                        <div className="step">
+                            <p className={`${formInfo.stepActive === 4 ? 'numbers active' : 'numbers'}`}>4</p>
+                            <div className="step-content">
+                                <p className="step-name">Step 4</p><p className="description-step">Summary</p>
+                            </div>
+                        </div>
+                        <br />
                     </div>
-                </FormBar>
-                <div className="form-navigation">
-                    <button className={`btn-nav ${this.state.stepActive === 1 ? 'btn-backstep disabled' : 'btn-backstep'}`} onClick={(e) => {
-                        e.preventDefault();
-                        this.handleBackStep();
-                    }}>Go Back</button>
-
-                    <button className="btn-nav btn-nextstep" onClick={(e) => {
-                        e.preventDefault();
-                        this.handleNextStep();
-                    }}>{this.state.stepActive === 4 ? 'Confirm' : 'Next step'}</button>
                 </div>
-            </FormCard>
-        </Container >
+            </SideBar>
+            <FormBar className="form">
+                <div key='1' className={`your-info ${formInfo.stepActive === 1 ? 'form-step enabled' : 'form-step disabled'}`}>
 
-    }
+                    <h1 className="title-description">Personal info</h1>
+                    <h3 className="subtitle-description">Please, provide your name, email adress and phone number.</h3>
 
+                    <FormWithHook/>
+
+                </div>
+                <div key='2' className={`select-plan ${formInfo.stepActive === 2 ? 'form-step enabled' : 'form-step disabled'}`}>
+                    <h1 className="title-description">Select Plan</h1>
+                    <h3 className="subtitle-description">You have the option of monthly or yearly billing.</h3>
+                    <div className="select-plan-description">
+                        <div className={`plan-option ${formInfo.selectedPlan.name === 'Arcade' ? 'checked' : ''}`} onClick={() => {
+                            if (formInfo.planDuration === false) {
+                                return handlePlan({ name: 'Arcade', price: 9 })
+                            }
+                            else {
+                                return handlePlan({ name: 'Arcade', price: 90 })
+                            }
+                        }}>
+                            <img src={arcadeIcon} alt="Arcade" />
+                            <p className="plan-name">Arcade</p>
+                            <p className="price-description-plan">{formInfo.planDuration ? '90$/Year' : '9$/Mon'}</p>
+                        </div>
+                        <div className={`plan-option ${formInfo.selectedPlan.name === 'Advanced' ? 'checked' : ''}`} onClick={() => {
+                            if (formInfo.planDuration === false) {
+                                return handlePlan({ name: 'Advanced', price: 12 })
+                            }
+                            else {
+                                return handlePlan({ name: 'Advanced', price: 120 })
+                            }
+                        }}>
+                            <img src={advancedIcon} alt="Advanced" />
+                            <p className="plan-name">Advanced</p>
+                            <p className="price-description-plan">{formInfo.planDuration ? '120$/Year' : '12$/Mon'}</p>
+                        </div>
+                        <div className={`plan-option ${formInfo.selectedPlan.name === 'Pro' ? 'checked' : ''}`} onClick={() => {
+                            if (formInfo.planDuration === false) {
+                                return handlePlan({ name: 'Pro', price: 15 })
+                            }
+                            else {
+                                return handlePlan({ name: 'Pro', price: 150 })
+                            }
+                        }}>
+                            <img src={proIcon} alt="Pro" />
+                            <p className="plan-name">Pro</p>
+                            <p className="price-description-plan">{formInfo.planDuration ? '150$/Year' : '15$/Mon'}</p>
+                        </div>
+                        <div className="plan-duration">
+                            <span className="switch-label-month">Monthly</span>
+                            <label className="switch-toggle">
+                                <input type="checkbox" id="toggle" onClick={(e) => handlePrint(e)} />
+                                <span className="slider"></span>
+                            </label>
+                            <span className="switch-label-year">Yearly</span>
+                        </div>
+                    </div>
+                </div>
+                <div key='3' className={`add-ons ${formInfo.stepActive === 3 ? 'form-step enabled' : 'form-step disabled'}`}>
+                    <h1 className="title-description">Pick add-ons</h1>
+                    <h3 className="subtitle-description">Add-ons help enhance your gaming experience.</h3>
+                    <div className="addons-description">
+                        <label htmlFor="addon 1">
+                            <div className={`add-on-option ${formInfo.addons.length > 0 ? formInfo.addons.map((addon) => {
+                                if (addon.name === 'Online service') {
+                                    return 'checked'
+                                }
+                                else {
+                                    return null
+                                }
+                            }) : ''}`}>
+                                <input type="checkbox" id="addon 1" onClick={() => {
+                                    if (formInfo.planDuration) {
+                                        return handleAddons({ name: 'Online service', price: 10 })
+                                    } else {
+                                        return handleAddons({ name: 'Online service', price: 1 })
+                                    }
+                                }} />
+                                <div className="add-on-info">
+                                    <p className="addon-service">Online service</p>
+                                    <p className="addon-service-description">Access to multiplayer games</p>
+                                </div>
+                                <p className="price-description-addon">{formInfo.planDuration ? '10$/yr' : '1$/mo'}</p>
+                            </div>
+                        </label>
+                        <label htmlFor="addon 2">
+                            <div className={`add-on-option ${formInfo.addons.length > 0 ? formInfo.addons.map((addon) => {
+                                if (addon.name === 'Larger storage') {
+                                    return 'checked'
+                                }
+                                else {
+                                    return null
+                                }
+                            }) : ''}`}>
+                                <input type="checkbox" id="addon 2" onClick={() => {
+                                    if (formInfo.planDuration) {
+                                        return handleAddons({ name: 'Larger Storage', price: 20 })
+                                    } else {
+                                        return handleAddons({ name: 'Larger Storage', price: 2 })
+                                    }
+                                }} />
+                                <div className="add-on-info">
+                                    <p className="addon-service">Larger storage</p>
+                                    <p className="addon-service-description">Extra 1TB of cloud save</p>
+                                </div>
+                                <p className="price-description-addon">{formInfo.planDuration ? '20$/yr' : '2$/mo'}</p>
+                            </div>
+                        </label>
+                        <label htmlFor="addon 3">
+                            <div className={`add-on-option ${formInfo.addons.length > 0 ? formInfo.addons.map((addon) => {
+                                if (addon.name === 'Customizable profile') {
+                                    return 'checked'
+                                }
+                                else {
+                                    return null
+                                }
+                            }) : ''}`}>
+                                <input type="checkbox" id="addon 3" onClick={() => {
+                                    if (formInfo.planDuration) {
+                                        return handleAddons({ name: 'Customizable profile', price: 20 })
+                                    } else {
+                                        return handleAddons({ name: 'customizable-profile', price: 2 })
+                                    }
+                                }} />
+                                <div className="add-on-info">
+                                    <p className="addon-service">Customizable Profile</p>
+                                    <p className="addon-service-description">Custom theme in your profile</p>
+                                </div>
+                                <p className="price-description-addon">{formInfo.planDuration ? '20$/yr' : '2$/mo'}</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div key='4' className={`summary ${formInfo.stepActive === 4 ? 'form-step enabled' : 'form-step disabled'}`}>
+                    <h1 className="title-description">Finishing up</h1>
+                    <h3 className="subtitle-description">Double check everything looks OK before confirming.</h3>
+                    <div className="summary-description">
+                        <div className="main-plan">
+                            <div className="change-plan">
+                                <p className="plan-name">{formInfo.selectedPlan.name}</p>
+                                <p className="btn-change-plan" onClick={() => {
+                                    setFormInfo((prevState) => ({ ...prevState, stepActive: 2 }))
+                                }}>Change</p>
+                            </div>
+                            <p className="price-plan">{formInfo.selectedPlan.price}$</p>
+                        </div>
+                        <div className="other-services">
+                            {formInfo.addons.length > 0 ? formInfo.addons.map((addon, index) => (<div className="service"><p key={index}>{addon.name}</p><p>+${addon.price}/yr</p></div>)) : 'Nenhum addon'}
+                        </div>
+                    </div>
+                    <div className="total-billing">
+                        <p>Total {formInfo.planDuration ? '(Per Year)' : '(Per Month)'} = ${formInfo.addons.length > 0 ? formInfo.addons.reduce((acc, addon) => acc + addon.price, 0) + formInfo.selectedPlan.price : formInfo.selectedPlan.price}</p>
+                    </div>
+                </div>
+            </FormBar>
+            <div className="form-navigation">
+                <button className={`btn-nav ${formInfo.stepActive === 1 ? 'btn-backstep disabled' : 'btn-backstep'}`} onClick={(e) => {
+                    e.preventDefault();
+                    handleBackStep();
+                }}>Go Back</button>
+
+                <button className="btn-nav btn-nextstep" onClick={(e) => {
+                    e.preventDefault();
+                    handleNextStep();
+                }}>{formInfo.stepActive === 4 ? 'Confirm' : 'Next step'}</button>
+            </div>
+        </FormCard>
+    </Container >
 }
-
-
 
 const Container = styled.section`
     display:flex;
