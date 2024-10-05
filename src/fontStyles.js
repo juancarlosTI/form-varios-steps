@@ -5,8 +5,18 @@ import Ubuntu from "../src/assets/fonts/Ubuntu-Medium.ttf"
 
 const FontStyles = createGlobalStyle`
     @font-face {
-        font-family:'Ubuntu Regular',
-        src: url(${UbuntuRegular}) format('ttf');
+        font-family:'Ubuntu Regular';
+        src: url(${UbuntuRegular}) format('truetype');
+    }
+
+    @font-face {
+        font-family:'Ubuntu Bold';
+        src:url(${UbuntuBold}) format('truetype');
+    }
+
+    @font-face {
+        font-family:'Ubuntu';
+        src:url(${Ubuntu}) format('truetype');
     }
 `
 

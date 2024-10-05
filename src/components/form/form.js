@@ -1,81 +1,26 @@
 //
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import styled, { keyframes } from "styled-components";
+import styled from "styled-components";
 
 
 
 // Images
+import sideBar from '../../assets/images/bg-sidebar-desktop.svg'
 import arcadeIcon from '../../assets/images/icon-arcade.svg'
 import advancedIcon from '../../assets/images/icon-advanced.svg'
 import proIcon from '../../assets/images/icon-pro.svg'
 
 
-const FormWithHook = forwardRef(({ onSubmit }, ref) => {
-    const { register, handleSubmit, formState: { errors }, trigger } = useForm();
-
-    const handleSubmitForm = (data) => {
-        console.log(data);
-    }
-
-    useImperativeHandle(ref, () => ({
-        validateForm: async () => {
-            const isValid = await trigger();
-            return isValid;
-        }
-    }));
-
-    return (
-        <form onSubmit={handleSubmit(handleSubmitForm)}>
-            <label htmlFor="name" className="name description-field">Name {errors.name && <p>{errors.name.message}</p>}</label>
-            <input
-                type="text"
-                id="name"
-                placeholder="Full Name: "
-                className="field"
-                {
-                ...register('name', {
-                    required: 'This field is required'
-                })
-                }
-            />
-
-            <label htmlFor="email" className="email description-field">Email Adress{errors.email && <p>{errors.email.message}</p>}</label>
-            <input
-                type="text"
-                id="email"
-                placeholder="Example: ''"
-                className="field"
-                {
-                ...register('email', {
-                    required: 'This field is required'
-                })
-                }
-            />
-
-            <label htmlFor="phone-number" className="phone-number description-field">Phone Number{errors.phone_number && <p>{errors.phone_number.message}</p>}</label>
-            <input
-                type="text"
-                id="phone-number"
-                placeholder="55 11 000xx3412"
-                className="field"
-                {
-                ...register('phone_number', {
-                    required: 'This field is required'
-                })
-                }
-            />
-        </form>
-    )
-});
-
 const Form = () => {
+
+    const { register, handleSubmit, formState: { errors } } = useForm();
 
     const [formInfo, setFormInfo] = useState({
         stepActive: 1,
-        selectedPlan:{name:null,price:null},
-        planDuration:false,
-        addons:[]
+        selectedPlan: { name: null, price: null },
+        planDuration: false,
+        addons: []
     })
 
     const handleBackStep = () => {
@@ -87,9 +32,10 @@ const Form = () => {
     const handleNextStep = () => {
         if (formInfo.stepActive === 1) {
             //Validar forms
-            console.log('Validar forms');
-            setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
+            handleSubmit(handleSubmitForm)()
+
         } else if (formInfo.stepActive === 4) {
+
             console.log('Formulário enviado');
         } else {
             setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
@@ -100,7 +46,7 @@ const Form = () => {
         if (formInfo.selectedPlan.name === selectedPlan.name) {
             setFormInfo((prevState) => ({
                 ...prevState,
-                selectedPlan: {name:null,price:null}
+                selectedPlan: { name: null, price: null }
             }))
         } else {
             setFormInfo((prevState) => ({
@@ -110,7 +56,6 @@ const Form = () => {
         }
     }
 
-
     const handleAddons = (addons) => {
         if (formInfo.addons.find(a => a.name === addons.name)) {
             setFormInfo((prevState) => ({
@@ -119,12 +64,12 @@ const Form = () => {
         }
         else {
             setFormInfo((prevState) => ({
-                ...prevState, addons: [addons]
+                ...prevState, addons: [...prevState.addons, addons]
             }))
         }
     }
 
-    const handlePrint = (e) => {
+    const handlePlanDuration = (e) => {
         if (e.target.checked) {
             setFormInfo((prevState) => ({
                 ...prevState, planDuration: true
@@ -138,10 +83,11 @@ const Form = () => {
         console.log(formInfo.selectedPlan)
     }
 
-    
-    const handleSubmit = () => {
-        console.log('Formulário: Submit')
-        setFormInfo({ stepActive: 1 })
+    const handleSubmitForm = (data) => {
+        console.log('Formulário: Submit');
+        console.log(data);
+
+        setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
     }
 
 
@@ -149,37 +95,37 @@ const Form = () => {
         <FormCard className="main-box">
             <SideBar className="sidebar">
                 <div className="image-side">
-                    <img src="/images/bg-sidebar-desktop.svg" alt="Side bar" />
+                    <img src={sideBar} alt="Side bar" />
                     <div className="steps">
                         <div className="step">
                             <p className={`${formInfo.stepActive === 1 ? 'numbers active' : 'numbers'}`}>1</p>
                             <div className="step-content">
-                                <p className="step-name">Step 1</p>
-                                <p className="description-step">Your info</p>
+                                <p className="step-name">STEP 1</p>
+                                <p className="description-step">YOUR INFO</p>
                             </div>
                         </div>
                         <br />
                         <div className="step">
                             <p className={`${formInfo.stepActive === 2 ? 'numbers active' : 'numbers'}`}>2</p>
                             <div className="step-content">
-                                <p className="step-name">Step 2</p><p className="description-step">Select Plan</p>
+                                <p className="step-name">STEP 2</p><p className="description-step">SELECT PLAN</p>
                             </div>
                         </div>
                         <br />
                         <div className="step">
                             <p className={`${formInfo.stepActive === 3 ? 'numbers active' : 'numbers'}`}>3</p>
                             <div className="step-content">
-                                <p className="step-name">Step 3</p><p className="description-step">Add-ons</p>
+                                <p className="step-name">STEP 3</p><p className="description-step">ADD-ONS</p>
                             </div>
                         </div>
                         <br />
                         <div className="step">
                             <p className={`${formInfo.stepActive === 4 ? 'numbers active' : 'numbers'}`}>4</p>
                             <div className="step-content">
-                                <p className="step-name">Step 4</p><p className="description-step">Summary</p>
+                                <p className="step-name">STEP 4</p><p className="description-step">SUMMARY</p>
                             </div>
                         </div>
-                        <br />
+
                     </div>
                 </div>
             </SideBar>
@@ -189,7 +135,46 @@ const Form = () => {
                     <h1 className="title-description">Personal info</h1>
                     <h3 className="subtitle-description">Please, provide your name, email adress and phone number.</h3>
 
-                    <FormWithHook/>
+                    <form onSubmit={handleSubmit(handleSubmitForm)}>
+                        <label htmlFor="name" className="name description-field">Name {errors.name && <p>{errors.name.message}</p>}</label>
+                        <input
+                            type="text"
+                            id="name"
+                            placeholder="Full Name: "
+                            className={`field ${errors.name ? 'error-input' : ''}`}
+                            {
+                            ...register('name', {
+                                required: 'This field is required'
+                            })
+                            }
+                        />
+
+                        <label htmlFor="email" className="email description-field">Email Adress{errors.email && <p>{errors.email.message}</p>}</label>
+                        <input
+                            type="text"
+                            id="email"
+                            placeholder="Example: ''"
+                            className={`field ${errors.email ? 'error-input' : ''}`}
+                            {
+                            ...register('email', {
+                                required: 'This field is required'
+                            })
+                            }
+                        />
+
+                        <label htmlFor="phone-number" className="phone-number description-field">Phone Number{errors.phone_number && <p>{errors.phone_number.message}</p>}</label>
+                        <input
+                            type="text"
+                            id="phone-number"
+                            placeholder="55 11 000xx3412"
+                            className={`field ${errors.phone_number ? 'error-input' : ''}`}
+                            {
+                            ...register('phone_number', {
+                                required: 'This field is required'
+                            })
+                            }
+                        />
+                    </form>
 
                 </div>
                 <div key='2' className={`select-plan ${formInfo.stepActive === 2 ? 'form-step enabled' : 'form-step disabled'}`}>
@@ -233,12 +218,12 @@ const Form = () => {
                             <p className="price-description-plan">{formInfo.planDuration ? '150$/Year' : '15$/Mon'}</p>
                         </div>
                         <div className="plan-duration">
-                            <span className="switch-label-month">Monthly</span>
+                            <span className={`switch-label-month ${formInfo.planDuration ? 'not-selected' : ''}`}>Monthly</span>
                             <label className="switch-toggle">
-                                <input type="checkbox" id="toggle" onClick={(e) => handlePrint(e)} />
+                                <input type="checkbox" id="toggle" onClick={(e) => handlePlanDuration(e)} />
                                 <span className="slider"></span>
                             </label>
-                            <span className="switch-label-year">Yearly</span>
+                            <span className={`switch-label-year ${formInfo.planDuration ? '' : 'not-selected'}`}>Yearly</span>
                         </div>
                     </div>
                 </div>
@@ -305,7 +290,7 @@ const Form = () => {
                                     if (formInfo.planDuration) {
                                         return handleAddons({ name: 'Customizable profile', price: 20 })
                                     } else {
-                                        return handleAddons({ name: 'customizable-profile', price: 2 })
+                                        return handleAddons({ name: 'Customizable profile', price: 2 })
                                     }
                                 }} />
                                 <div className="add-on-info">
@@ -323,19 +308,24 @@ const Form = () => {
                     <div className="summary-description">
                         <div className="main-plan">
                             <div className="change-plan">
-                                <p className="plan-name">{formInfo.selectedPlan.name}</p>
+                                <p className="plan-final">{formInfo.selectedPlan.name} {formInfo.planDuration ? '(Yearly)' : '(Monthly)'}</p>
                                 <p className="btn-change-plan" onClick={() => {
                                     setFormInfo((prevState) => ({ ...prevState, stepActive: 2 }))
                                 }}>Change</p>
                             </div>
-                            <p className="price-plan">{formInfo.selectedPlan.price}$</p>
+                            <p className="price-plan">{formInfo.selectedPlan.price}${formInfo.planDuration ? '/yr' : '/mo'}</p>
                         </div>
                         <div className="other-services">
-                            {formInfo.addons.length > 0 ? formInfo.addons.map((addon, index) => (<div className="service"><p key={index}>{addon.name}</p><p>+${addon.price}/yr</p></div>)) : 'Nenhum addon'}
+                            {formInfo.addons.length > 0 ? formInfo.addons.map((addon, index) => (
+                                <div className="service"  key={index}>
+                                    <p className="plus-service-name">{addon.name}</p>
+                                    <p className="plus-service-price">+${addon.price}{formInfo.planDuration ? '/yr' : '/mo'}</p>
+                                </div>)) : 'Nenhum add-on'}
                         </div>
                     </div>
                     <div className="total-billing">
-                        <p>Total {formInfo.planDuration ? '(Per Year)' : '(Per Month)'} = ${formInfo.addons.length > 0 ? formInfo.addons.reduce((acc, addon) => acc + addon.price, 0) + formInfo.selectedPlan.price : formInfo.selectedPlan.price}</p>
+                        <p className="total-billing-type">Total {formInfo.planDuration ? '(Per Year)' : '(Per Month)'}</p>
+                        <p className="total-price-billing">${formInfo.addons.length > 0 ? formInfo.addons.reduce((acc, addon) => acc + addon.price, 0) + formInfo.selectedPlan.price : formInfo.selectedPlan.price}{formInfo.planDuration ? '/yr':'/mo'}</p>
                     </div>
                 </div>
             </FormBar>
@@ -345,7 +335,7 @@ const Form = () => {
                     handleBackStep();
                 }}>Go Back</button>
 
-                <button className="btn-nav btn-nextstep" onClick={(e) => {
+                <button className={`btn-nav btn-nextstep ${formInfo.stepActive === 4 ? 'color-change':''}`} onClick={(e) => {
                     e.preventDefault();
                     handleNextStep();
                 }}>{formInfo.stepActive === 4 ? 'Confirm' : 'Next step'}</button>
@@ -361,8 +351,6 @@ const Container = styled.section`
     justify-content:center;
     align-items:center;
     background-color:lightgrey;
-    font-family:'Ubuntu';
-
 `
 const FormCard = styled.div`
     display:grid;
@@ -377,9 +365,6 @@ const FormCard = styled.div`
     background-color:white;
     border-radius: 20px;
     font-size:12px;
-
-    
-    font-family:'Ubuntu Regular';
 
 
     .form {
@@ -427,6 +412,14 @@ const FormCard = styled.div`
         margin-left:150px;
     }
 
+    .color-change {
+        background-color:blue;
+    }
+
+    .btn-nextstep.color-change:hover {
+        background-color:#3333FF;
+    }
+
     .btn-nextstep:hover {
         background-color:#41527C;
         border-radius7px;
@@ -438,55 +431,55 @@ const FormCard = styled.div`
     }
 
     .btn-backstep:hover {
-        color:#1d2e54;
+        color:#1E147A;
     }
 
     .btn-backstep.disabled {
         display:none;
     }
-
-    
 `
 const FormBar = styled.div`
+    font-family:'Ubuntu';
+    color:#1E147A;
 
     label.description-field {
         display:flex;
         align-items:center;
         justify-content:space-between;
         padding: 3px 0;
+        margin-top:15px;
     }
 
     label.description-field p{
         font-weight:bold;
-        display:none;
+        color:red;
         margin:0;
-    }
-
-    .field:hover {
-        cursor:pointer;
     }
 
     .title-description {
         font-size:28px;
         margin:0;
+        font-family:'Ubuntu Bold';
     }
 
     .subtitle-description {
-        color:lightgrey;
-        font-size:18px;
+        color:#B6B6B6;
+        font-size:14px;
         font-weight:normal;
-        margin-bottom:50px;
+        margin:20px 0;
     }
 
     .field {
         border-radius:10px;
-        border-color:lightgrey;
+        color:black;
         border-width:1px;
         border-style:solid;
         height:32px;
-        padding:10px;
+        padding:5px 0;
         font-size:16px;
         width:100%;
+        text-indent:10px;
+        border-color:#B6B6B6;
     }
 
     .field:focus {
@@ -495,8 +488,16 @@ const FormBar = styled.div`
     }
 
     .field::placeholder {
-        color: lightgrey; /* Muda a cor do placeholder */
-        font-size: 16px; /* Ajuste opcional para o tamanho da fonte */
+        color:#B6B6B6;
+        font-size: 16px; 
+    }
+
+    .field:hover {
+        cursor:pointer;
+    }
+
+    .field.error-input {
+        border-color:red;
     }
 
     label.description-field p.active {
@@ -525,6 +526,8 @@ const FormBar = styled.div`
         border-radius:10px;
         padding:10px;
         transition:border 0.2s ease-in-out;
+        display:grid;
+        grid-template-rows: 80px 50px;
     }
 
     .plan-option.checked {
@@ -534,8 +537,19 @@ const FormBar = styled.div`
     .plan-option:hover {
         cursor:pointer;
         border: 1px solid blue;
-        
     }
+
+    .plan-name {
+        font-size:16px;
+        color:#1E147A;
+        align-self:flex-end;
+    }
+
+    .price-description-plan {
+        font-size:14px;
+        color:#B6B6B6;
+    }
+
 
     .plan-duration {
         flex-basis:100%;
@@ -549,7 +563,6 @@ const FormBar = styled.div`
 
     .switch-label-month, .switch-label-year {
         font-size:16px;
-        color:black;
     }
 
     .switch-toggle {
@@ -593,15 +606,10 @@ const FormBar = styled.div`
         transform: translateX(24px);
     }
 
-    .switch-toggle input:checked ~ .switch-label-year {
-        color:#1d2e54;
-        font-weight:bold;
+    .switch-label-month.not-selected, .switch-label-year.not-selected {
+        color:lightgrey;
     }
 
-    .switch-toggle input:not(:checked) ~ .switch-label-month {
-        color:#1d2e54;
-        font-weight:bold;
-    }
 
     .add-on-description {
         width:100%;
@@ -641,7 +649,7 @@ const FormBar = styled.div`
     }
 
     .addon-service-description {
-        color:lightgrey;
+        color:#B6B6B6;
     }
 
     .addon-on-info {
@@ -660,7 +668,6 @@ const FormBar = styled.div`
     .summary-description {
         background-color:#F0F0F0;
         padding:20px;
-        
     }
 
     .summary-description, .total-billing {
@@ -685,20 +692,23 @@ const FormBar = styled.div`
         width:fit-content;
     }
 
-    .change-plan {
-       //margin-bottom:20px;
-    }
-
     .btn-change-plan {
         cursor:pointer;    
         width:fit-content;
         text-decoration-line:underline;
         text-decoration-color: blue;
+        font-family:'Ubuntu Regular';
+        color:blue;
+    }
+
+    .plan-final {
+        color:#1E147A;
     }
 
     .price-plan {
         grid-area:price;
         justify-self:end;
+        font-family:'Ubuntu Bold';
     }
 
     .other-services {
@@ -714,8 +724,28 @@ const FormBar = styled.div`
         margin: 10px 0;
     }
 
+    .plus-service-name {
+        color:#B6B6B6;
+    }
+
+    .plus-service-price {
+        font-family:'Ubuntu';
+    }
+
     .total-billing {
         padding:20px;
+        display:flex;
+        justify-content:space-between;
+    }
+
+    .total-billing .total-billing-type {
+        color:#B6B6B6;
+    }
+
+    .total-price-billing {
+        color:blue;
+        font-size:22px;
+        font-family:'Ubuntu Bold';
     }
 
     
@@ -726,11 +756,11 @@ const SideBar = styled.div`
     display:flex;
     grid-area:side-bar;
     justify-content:center;
+    font-family:'Ubuntu Regular';
 
     .image-side {
         position:relative;
         display:flex;
-
     }
 
     .image-side img {
@@ -745,60 +775,47 @@ const SideBar = styled.div`
         flex-direction:column;
         color:white;
         //left:50%;
-        transform:translate(0,25%);
+        transform:translate(10px,40%);
     }
 
     .step {
         display:flex;
         align-items:center;
+        margin-top:15px;
     }
 
     .step-name {
         margin:0;
-        font-size:18px;
+        font-size:12px;
+        color:lightgrey;
     }
 
     .description-step {
-        font-size:24px;
+        font-size:14px;
+        font-family:'Ubuntu Regular';
         font-weight:bold;
+        letter-spacing:2px;
     }
+
     .numbers {
-        font-size:22px;
+        font-size:16px;
         align-self:center;
-        padding:2px 10px;
+        padding:5px 10px;
         border: 1px solid white;
         border-radius:50%;
         margin:0 20px;
+        font-family:'Ubuntu Bold';
     }
 
     .numbers.active {
-        background-color:lightgrey;
-        color:blue;
+        background-color:lightblue;
+        color:black;
     }
-
-
-    // .sidebar p {
-    //     position:absolute;
-    // }
 
     .sidebar img {
         margin-left:15px;
         
     }
+`
 
-    
-
-`
-const PontoPisca = keyframes`
-  0% {opacity : 0;}
-  50% {opacity : 1;}
-  100% {opacity : 0;}
-`
-const P = styled.p`
-    font-size: 32px;
-    animation: ${PontoPisca} 1.5s infinite;
-`
-const LoadingAnimation = styled.div`
-    display:flex;
-`
 export default (Form)
