@@ -1,0 +1,20 @@
+- Responsividade mobile - WIP
+- Form 1 - OK
+- Form 2 - Items (planos) tem um tamanho muito grande; - OK
+- Form 3 - Items (addons) ultrapassam o tamanho do container pai; - OK
+- Form 4 - Listagem dos items (planos, addons) não quebram linha e Preço dos addons ultrapassa o tamanho do container (grid); - OK
+
+- Validação do Formulário - (Selecionar plano obrigatório - Validação dos campos ao realizar o submit);
+
+- Na opção 'CHANGE PLAN', ao alterar o PLANO, os estados dos ADD-ONS deverá ser alterado ou reiniciado para fornecer o preço corretamente. - OK
+
+- Exibir os dados que estão no react-hook-form; - OK
+
+- Responsividade OK.
+
+
+- Restante:
+
+- Active Status;
+- Tamanho das fontes;
+- Responsividade Mobile; 

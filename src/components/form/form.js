@@ -14,7 +14,7 @@ import proIcon from '../../assets/images/icon-pro.svg'
 
 const Form = () => {
 
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, formState: { errors }, getValues } = useForm();
 
     const [formInfo, setFormInfo] = useState({
         stepActive: 1,
@@ -32,11 +32,13 @@ const Form = () => {
     const handleNextStep = () => {
         if (formInfo.stepActive === 1) {
             //Validar forms
-            handleSubmit(handleSubmitForm)()
+            handleSubmit(handleSubmitForm())
 
         } else if (formInfo.stepActive === 4) {
 
             console.log('Formulário enviado');
+            console.log(formInfo);
+            console.log(getValues());
         } else {
             setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
         }
@@ -70,22 +72,41 @@ const Form = () => {
     }
 
     const handlePlanDuration = (e) => {
+        // Verificar quais addons existem no state e salvar o nome;
+        // Quando a duração do plano mudar, os addons tambem mudam; Como a precificação do add-on tambem muda, atualizar os addons com a nova informação;
+
+        const priceMap = e.target.checked ? { Arcade: 90, Advanced: 120, Pro: 150 } : { Arcade: 9, Advanced: 12, Pro: 15 };
+        const newPlan = { name: formInfo.selectedPlan.name, price: priceMap[formInfo.selectedPlan.name] };
+        const addonMap = e.target.checked ? { 'Online service': 10, 'Larger Storage': 20, 'Customizable profile': 20 } : { 'Online service': 1, 'Larger Storage': 2, 'Customizable profile': 2 };
+
         if (e.target.checked) {
             setFormInfo((prevState) => ({
-                ...prevState, planDuration: true
+                ...prevState,
+                addons: prevState.addons.map(addon => ({
+                    ...addon,
+                    price: addonMap[addon.name]
+                })),
+                selectedPlan: newPlan,
+                planDuration: true
             }))
         }
         else {
             setFormInfo((prevState) => ({
-                ...prevState, planDuration: false
+                ...prevState,
+                addons: prevState.addons.map(addon => ({
+                    ...addon,
+                    price: addonMap[addon.name]
+                })),
+                selectedPlan: newPlan,
+                planDuration: false
             }))
         }
-        console.log(formInfo.selectedPlan)
+
     }
 
-    const handleSubmitForm = (data) => {
-        console.log('Formulário: Submit');
-        console.log(data);
+    const handleSubmitForm = () => {
+        // Opcional: estruturar um objeto contendo a informação do react-hook-form com o state.
+        console.log('Formulário registrado no react-hook-form');
 
         setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
     }
@@ -94,39 +115,41 @@ const Form = () => {
     return <Container>
         <FormCard className="main-box">
             <SideBar className="sidebar">
-                <div className="image-side">
-                    <img src={sideBar} alt="Side bar" />
-                    <div className="steps">
-                        <div className="step">
-                            <p className={`${formInfo.stepActive === 1 ? 'numbers active' : 'numbers'}`}>1</p>
-                            <div className="step-content">
-                                <p className="step-name">STEP 1</p>
-                                <p className="description-step">YOUR INFO</p>
-                            </div>
+                <img src={sideBar} alt="Side bar" />
+                <div className="steps">
+                    <div className="step">
+                        <p className={`${formInfo.stepActive === 1 ? 'numbers active' : 'numbers'}`}>1</p>
+                        <div className="step-content">
+                            <p className="step-name">STEP 1</p>
+                            <p className="description-step">YOUR INFO</p>
                         </div>
-                        <br />
-                        <div className="step">
-                            <p className={`${formInfo.stepActive === 2 ? 'numbers active' : 'numbers'}`}>2</p>
-                            <div className="step-content">
-                                <p className="step-name">STEP 2</p><p className="description-step">SELECT PLAN</p>
-                            </div>
-                        </div>
-                        <br />
-                        <div className="step">
-                            <p className={`${formInfo.stepActive === 3 ? 'numbers active' : 'numbers'}`}>3</p>
-                            <div className="step-content">
-                                <p className="step-name">STEP 3</p><p className="description-step">ADD-ONS</p>
-                            </div>
-                        </div>
-                        <br />
-                        <div className="step">
-                            <p className={`${formInfo.stepActive === 4 ? 'numbers active' : 'numbers'}`}>4</p>
-                            <div className="step-content">
-                                <p className="step-name">STEP 4</p><p className="description-step">SUMMARY</p>
-                            </div>
-                        </div>
-
                     </div>
+                    <br />
+                    <div className="step">
+                        <p className={`${formInfo.stepActive === 2 ? 'numbers active' : 'numbers'}`}>2</p>
+                        <div className="step-content">
+                            <p className="step-name">STEP 2</p><p className="description-step">SELECT PLAN</p>
+                        </div>
+                    </div>
+                    <br />
+                    <div className="step">
+                        <p className={`${formInfo.stepActive === 3 ? 'numbers active' : 'numbers'}`}>3</p>
+                        <div className="step-content">
+                            <p className="step-name">STEP 3</p><p className="description-step">ADD-ONS</p>
+                        </div>
+                    </div>
+                    <br />
+                    <div className="step">
+                        <p className={`${formInfo.stepActive === 4 ? 'numbers active' : 'numbers'}`}>4</p>
+                        <div className="step-content">
+                            <p className="step-name">STEP 4</p><p className="description-step">SUMMARY</p>
+                        </div>
+                    </div>
+
+                </div>
+                <div className="image-side">
+
+
                 </div>
             </SideBar>
             <FormBar className="form">
@@ -189,7 +212,7 @@ const Form = () => {
                                 return handlePlan({ name: 'Arcade', price: 90 })
                             }
                         }}>
-                            <img src={arcadeIcon} alt="Arcade" />
+                            <img className="plan-image" src={arcadeIcon} alt="Arcade" />
                             <p className="plan-name">Arcade</p>
                             <p className="price-description-plan">{formInfo.planDuration ? '90$/Year' : '9$/Mon'}</p>
                         </div>
@@ -201,7 +224,7 @@ const Form = () => {
                                 return handlePlan({ name: 'Advanced', price: 120 })
                             }
                         }}>
-                            <img src={advancedIcon} alt="Advanced" />
+                            <img className="plan-image" src={advancedIcon} alt="Advanced" />
                             <p className="plan-name">Advanced</p>
                             <p className="price-description-plan">{formInfo.planDuration ? '120$/Year' : '12$/Mon'}</p>
                         </div>
@@ -213,7 +236,7 @@ const Form = () => {
                                 return handlePlan({ name: 'Pro', price: 150 })
                             }
                         }}>
-                            <img src={proIcon} alt="Pro" />
+                            <img className="plan-image" src={proIcon} alt="Pro" />
                             <p className="plan-name">Pro</p>
                             <p className="price-description-plan">{formInfo.planDuration ? '150$/Year' : '15$/Mon'}</p>
                         </div>
@@ -317,7 +340,7 @@ const Form = () => {
                         </div>
                         <div className="other-services">
                             {formInfo.addons.length > 0 ? formInfo.addons.map((addon, index) => (
-                                <div className="service"  key={index}>
+                                <div className="service" key={index}>
                                     <p className="plus-service-name">{addon.name}</p>
                                     <p className="plus-service-price">+${addon.price}{formInfo.planDuration ? '/yr' : '/mo'}</p>
                                 </div>)) : 'Nenhum add-on'}
@@ -325,7 +348,7 @@ const Form = () => {
                     </div>
                     <div className="total-billing">
                         <p className="total-billing-type">Total {formInfo.planDuration ? '(Per Year)' : '(Per Month)'}</p>
-                        <p className="total-price-billing">${formInfo.addons.length > 0 ? formInfo.addons.reduce((acc, addon) => acc + addon.price, 0) + formInfo.selectedPlan.price : formInfo.selectedPlan.price}{formInfo.planDuration ? '/yr':'/mo'}</p>
+                        <p className="total-price-billing">${formInfo.addons.length > 0 ? formInfo.addons.reduce((acc, addon) => acc + addon.price, 0) + formInfo.selectedPlan.price : formInfo.selectedPlan.price}{formInfo.planDuration ? '/yr' : '/mo'}</p>
                     </div>
                 </div>
             </FormBar>
@@ -335,7 +358,7 @@ const Form = () => {
                     handleBackStep();
                 }}>Go Back</button>
 
-                <button className={`btn-nav btn-nextstep ${formInfo.stepActive === 4 ? 'color-change':''}`} onClick={(e) => {
+                <button className={`btn-nav btn-nextstep ${formInfo.stepActive === 4 ? 'color-change' : ''}`} onClick={(e) => {
                     e.preventDefault();
                     handleNextStep();
                 }}>{formInfo.stepActive === 4 ? 'Confirm' : 'Next step'}</button>
@@ -354,13 +377,14 @@ const Container = styled.section`
 `
 const FormCard = styled.div`
     display:grid;
-    grid-template-columns: 40% 1fr;
+    grid-template-columns: 40% 60%;
     grid-template-areas: "side-bar form"
                          "side-bar navigation";
     //justify-content:center;
     //flex-direction:column;
     //align-items:center;
-    width:800px;
+    max-width:800px;
+    width:100%;
     height:600px;
     background-color:white;
     border-radius: 20px;
@@ -371,10 +395,18 @@ const FormCard = styled.div`
         grid-area:form;
         display:flex;
         flex-direction:column;
+        box-sizing:border-box;
         padding:20px;
-        width:350px;
-        margin-left:40px;
-        margin-top:50px;
+        max-width:450px;
+        width:100%;
+        align-items:center;
+        position:relative;
+        top:10%;
+    }
+
+    .your-info, .select-plan, .add-ons, .summary {
+        max-width:400px;
+        width:100%;
     }
 
     .form-step.enabled{
@@ -388,11 +420,11 @@ const FormCard = styled.div`
     .form-navigation {
         grid-area:navigation;
         display:flex;
-        justify-content:flex-end;
-        align-items:flex-end;
+        justify-content:space-between;
+        max-width:450px;
         width:100%;
-        transform:translate(-70px,-50px);
-        //justify-self:flex-end;
+        padding:20px;
+        box-sizing:border-box;
     }
 
     .btn-nav {
@@ -409,7 +441,11 @@ const FormCard = styled.div`
         height:40px;
         background-color:#1d2e54;
         color:white;
-        margin-left:150px;
+        align-self:flex-end;
+    }
+
+    .btn-backstep {
+    
     }
 
     .color-change {
@@ -426,6 +462,7 @@ const FormCard = styled.div`
     }
 
     .btn-backstep {
+        align-self:self-end;
         background-color:white;
         color:lightgrey;
     }
@@ -435,12 +472,14 @@ const FormCard = styled.div`
     }
 
     .btn-backstep.disabled {
-        display:none;
+        opacity:0;
+        pointer-events:none;
     }
 `
 const FormBar = styled.div`
     font-family:'Ubuntu';
     color:#1E147A;
+    
 
     label.description-field {
         display:flex;
@@ -477,6 +516,7 @@ const FormBar = styled.div`
         height:32px;
         padding:5px 0;
         font-size:16px;
+        max-width:100%;
         width:100%;
         text-indent:10px;
         border-color:#B6B6B6;
@@ -507,27 +547,36 @@ const FormBar = styled.div`
 
     .select-plan.enabled{
         display:block;
+        box-sizing:border-box;
+        max-width:400px;
+        width:100%;
+        flex-shrink:1;
     }
 
     .select-plan-description {
         display:flex;
         flex-wrap:wrap;
-        justify-content:center;
+        //justify-content:center;
+        gap:20px;
+        align-items:center;
     }
 
     .plan-option {
-        width:150px;
-        height:150px;
-        flex:1;
+        max-width:150px;
+        min-width:70px;
+        width:100%;
+        max-height:180px;
+        height:100%;
+        flex: 1 1 0;
         background-color:white;
         color:black;
-        margin:10px;
         border:1px solid #F0F0F0;
         border-radius:10px;
         padding:10px;
         transition:border 0.2s ease-in-out;
         display:grid;
-        grid-template-rows: 80px 50px;
+        grid-template-rows: 80px 30px 30px;
+        box-sizing:border-box;
     }
 
     .plan-option.checked {
@@ -539,17 +588,24 @@ const FormBar = styled.div`
         border: 1px solid blue;
     }
 
+    .plan-image {
+        width:40px;
+        height:40px;
+        // margin-bottom:50px;
+    }
+
     .plan-name {
         font-size:16px;
         color:#1E147A;
         align-self:flex-end;
+        grid-area: plan-name;
     }
 
     .price-description-plan {
         font-size:14px;
         color:#B6B6B6;
+        grid-area: price;
     }
-
 
     .plan-duration {
         flex-basis:100%;
@@ -617,7 +673,7 @@ const FormBar = styled.div`
 
     .add-on-option {
         width:100%;
-        height:60px;
+        //height:60px;
         display:grid;
         grid-template-columns: 5% 75% 20%;
         grid-template-areas: "checked info addon-price";
@@ -629,6 +685,7 @@ const FormBar = styled.div`
         margin-top:15px;
         cursor:pointer;
         transition:border 0.2s ease-in-out;
+        box-sizing:border-box;
     }
 
     .add-on-option input {
@@ -663,11 +720,16 @@ const FormBar = styled.div`
     .price-description-addon {
         grid-area: addon-price;
         width:fit-content;
+        word-break: break-all;
+    }
+
+    .summary {
     }
 
     .summary-description {
         background-color:#F0F0F0;
         padding:20px;
+        border-radius:10px;
     }
 
     .summary-description, .total-billing {
@@ -679,6 +741,7 @@ const FormBar = styled.div`
         grid-template-columns: 90% 10%;
         grid-template-areas: "plan price";
         align-items:center;
+        // padding:20px;
     }
 
     .change-plan {
@@ -721,7 +784,8 @@ const FormBar = styled.div`
     .other-services .service {
         display:flex;
         justify-content:space-between;
-        margin: 10px 0;
+        // margin: 10px 0;
+        padding: 10px 0;
     }
 
     .plus-service-name {
@@ -748,40 +812,85 @@ const FormBar = styled.div`
         font-family:'Ubuntu Bold';
     }
 
-    
+    @media(max-width:768px){
 
-    
+        .select-plan-description{
+            flex-direction:column;
+            //align-items:center;
+            
+        }
+    }
+
+    @media(max-width:768px){
+        .plan-option {
+            max-width:300px;
+            max-height:60px;
+            display:flex;
+            flex-direction: column;
+            // // grid-template-columns: repeat(2,50%);
+            // grid-template-areas: "image plan-name"
+            //                       "image price";
+        }
+
+        .price-description-plan {
+            align-self:flex-end;
+        }
+    }
+
+    @media(max-width:375px){
+        .plan-option {
+            max-width:120px;
+        }
+
+        .plan-name {
+            align-self:flex-start;
+        }
+
+        .price-description-plan {
+            align-self:flex-start;
+        }
+    }
+
 `
 const SideBar = styled.div`
     display:flex;
     grid-area:side-bar;
     justify-content:center;
     font-family:'Ubuntu Regular';
+    max-width:100%;
+    position:relative;
 
-    .image-side {
-        position:relative;
-        display:flex;
-    }
-
-    .image-side img {
+    img {
+        //align-self:center;
+        max-width:240px;
         width:100%;
-        height:90%;
-        align-self:center;
+        height:540px;
+        //position:relative;
+        object-fit:cover;
+        border-radius:10px;
     }
 
-    .image-side .steps {
+    .steps {
         position:absolute;
         display:flex;
         flex-direction:column;
         color:white;
-        //left:50%;
-        transform:translate(10px,40%);
+        overflow-wrap:break-word;
+        word-break:break-all;
+        width:75%;
+        top:20%;
+        // left:15%;
+        gap:10px;
+    }
+
+    img, .steps {
+        align-self:center;
     }
 
     .step {
         display:flex;
         align-items:center;
-        margin-top:15px;
+        gap:25px;
     }
 
     .step-name {
@@ -803,7 +912,7 @@ const SideBar = styled.div`
         padding:5px 10px;
         border: 1px solid white;
         border-radius:50%;
-        margin:0 20px;
+        margin:0 0 0 20px;
         font-family:'Ubuntu Bold';
     }
 
@@ -812,10 +921,9 @@ const SideBar = styled.div`
         color:black;
     }
 
-    .sidebar img {
-        margin-left:15px;
-        
-    }
+    // .sidebar img {
+    //     margin-left:15px;
+    // }
 `
 
 export default (Form)
