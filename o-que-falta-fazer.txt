@@ -10,11 +10,14 @@
 
 - Exibir os dados que estão no react-hook-form; - OK
 
-- Responsividade OK.
+- Responsividade - OK.
 
+
+- Active Status - OK;
+
+- Tamanho das fontes - OK;
 
 - Restante:
 
-- Active Status;
-- Tamanho das fontes;
+
 - Responsividade Mobile; 

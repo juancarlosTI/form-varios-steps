@@ -213,8 +213,10 @@ const Form = () => {
                             }
                         }}>
                             <img className="plan-image" src={arcadeIcon} alt="Arcade" />
-                            <p className="plan-name">Arcade</p>
-                            <p className="price-description-plan">{formInfo.planDuration ? '90$/Year' : '9$/Mon'}</p>
+                            <div className="plan-description">
+                                <p className="plan-name">Arcade</p>
+                                <p className="price-description-plan">{formInfo.planDuration ? '90$/Year' : '9$/Mon'}</p>
+                            </div>
                         </div>
                         <div className={`plan-option ${formInfo.selectedPlan.name === 'Advanced' ? 'checked' : ''}`} onClick={() => {
                             if (formInfo.planDuration === false) {
@@ -225,8 +227,10 @@ const Form = () => {
                             }
                         }}>
                             <img className="plan-image" src={advancedIcon} alt="Advanced" />
-                            <p className="plan-name">Advanced</p>
-                            <p className="price-description-plan">{formInfo.planDuration ? '120$/Year' : '12$/Mon'}</p>
+                            <div className="plan-description">
+                                <p className="plan-name">Advanced</p>
+                                <p className="price-description-plan">{formInfo.planDuration ? '120$/Year' : '12$/Mon'}</p>
+                            </div>
                         </div>
                         <div className={`plan-option ${formInfo.selectedPlan.name === 'Pro' ? 'checked' : ''}`} onClick={() => {
                             if (formInfo.planDuration === false) {
@@ -237,8 +241,10 @@ const Form = () => {
                             }
                         }}>
                             <img className="plan-image" src={proIcon} alt="Pro" />
-                            <p className="plan-name">Pro</p>
-                            <p className="price-description-plan">{formInfo.planDuration ? '150$/Year' : '15$/Mon'}</p>
+                            <div className="plan-description">
+                                <p className="plan-name">Pro</p>
+                                <p className="price-description-plan">{formInfo.planDuration ? '150$/Year' : '15$/Mon'}</p>
+                            </div>
                         </div>
                         <div className="plan-duration">
                             <span className={`switch-label-month ${formInfo.planDuration ? 'not-selected' : ''}`}>Monthly</span>
@@ -255,14 +261,7 @@ const Form = () => {
                     <h3 className="subtitle-description">Add-ons help enhance your gaming experience.</h3>
                     <div className="addons-description">
                         <label htmlFor="addon 1">
-                            <div className={`add-on-option ${formInfo.addons.length > 0 ? formInfo.addons.map((addon) => {
-                                if (addon.name === 'Online service') {
-                                    return 'checked'
-                                }
-                                else {
-                                    return null
-                                }
-                            }) : ''}`}>
+                            <div className={`add-on-option ${formInfo.addons.some((addon) => addon.name === 'Online service') ? 'checked' : ''}`}>
                                 <input type="checkbox" id="addon 1" onClick={() => {
                                     if (formInfo.planDuration) {
                                         return handleAddons({ name: 'Online service', price: 10 })
@@ -278,14 +277,7 @@ const Form = () => {
                             </div>
                         </label>
                         <label htmlFor="addon 2">
-                            <div className={`add-on-option ${formInfo.addons.length > 0 ? formInfo.addons.map((addon) => {
-                                if (addon.name === 'Larger storage') {
-                                    return 'checked'
-                                }
-                                else {
-                                    return null
-                                }
-                            }) : ''}`}>
+                            <div className={`add-on-option ${formInfo.addons.some((addon) => addon.name === 'Larger Storage') ? 'checked' : ''} `}>
                                 <input type="checkbox" id="addon 2" onClick={() => {
                                     if (formInfo.planDuration) {
                                         return handleAddons({ name: 'Larger Storage', price: 20 })
@@ -301,14 +293,7 @@ const Form = () => {
                             </div>
                         </label>
                         <label htmlFor="addon 3">
-                            <div className={`add-on-option ${formInfo.addons.length > 0 ? formInfo.addons.map((addon) => {
-                                if (addon.name === 'Customizable profile') {
-                                    return 'checked'
-                                }
-                                else {
-                                    return null
-                                }
-                            }) : ''}`}>
+                            <div className={`add-on-option ${formInfo.addons.some((addon) => addon.name === 'Customizable profile') ? 'checked' : ''}`}>
                                 <input type="checkbox" id="addon 3" onClick={() => {
                                     if (formInfo.planDuration) {
                                         return handleAddons({ name: 'Customizable profile', price: 20 })
@@ -380,9 +365,6 @@ const FormCard = styled.div`
     grid-template-columns: 40% 60%;
     grid-template-areas: "side-bar form"
                          "side-bar navigation";
-    //justify-content:center;
-    //flex-direction:column;
-    //align-items:center;
     max-width:800px;
     width:100%;
     height:600px;
@@ -423,8 +405,9 @@ const FormCard = styled.div`
         justify-content:space-between;
         max-width:450px;
         width:100%;
-        padding:20px;
+        padding:15px 20px;
         box-sizing:border-box;
+        z-index:1;
     }
 
     .btn-nav {
@@ -566,7 +549,7 @@ const FormBar = styled.div`
         min-width:70px;
         width:100%;
         max-height:180px;
-        height:100%;
+        height:180px;
         flex: 1 1 0;
         background-color:white;
         color:black;
@@ -574,9 +557,11 @@ const FormBar = styled.div`
         border-radius:10px;
         padding:10px;
         transition:border 0.2s ease-in-out;
-        display:grid;
-        grid-template-rows: 80px 30px 30px;
+        display:flex;
+        flex-direction:column;
         box-sizing:border-box;
+        justify-content:space-between;
+        //align-items:center;
     }
 
     .plan-option.checked {
@@ -591,13 +576,16 @@ const FormBar = styled.div`
     .plan-image {
         width:40px;
         height:40px;
-        // margin-bottom:50px;
+    }
+
+    .plan-description {
+        display:flex;
+        flex-direction:column;
     }
 
     .plan-name {
         font-size:16px;
         color:#1E147A;
-        align-self:flex-end;
         grid-area: plan-name;
     }
 
@@ -607,9 +595,12 @@ const FormBar = styled.div`
         grid-area: price;
     }
 
+    
+
     .plan-duration {
-        flex-basis:100%;
         display:flex;
+        max-width:400px;
+        width:100%;
         justify-content:center;
         align-items:center;
         height:50px; 
@@ -673,6 +664,7 @@ const FormBar = styled.div`
 
     .add-on-option {
         width:100%;
+        min-height:80px;
         //height:60px;
         display:grid;
         grid-template-columns: 5% 75% 20%;
@@ -695,6 +687,7 @@ const FormBar = styled.div`
 
     .add-on-option.checked {
         border: 1px solid blue;
+        background-color:rgb(238, 249, 255);
     }
 
     .add-on-option:hover {
@@ -727,7 +720,7 @@ const FormBar = styled.div`
     }
 
     .summary-description {
-        background-color:#F0F0F0;
+        background-color:rgb(238, 249, 255);
         padding:20px;
         border-radius:10px;
     }
@@ -741,7 +734,6 @@ const FormBar = styled.div`
         grid-template-columns: 90% 10%;
         grid-template-areas: "plan price";
         align-items:center;
-        // padding:20px;
     }
 
     .change-plan {
@@ -784,7 +776,6 @@ const FormBar = styled.div`
     .other-services .service {
         display:flex;
         justify-content:space-between;
-        // margin: 10px 0;
         padding: 10px 0;
     }
 
@@ -816,8 +807,6 @@ const FormBar = styled.div`
 
         .select-plan-description{
             flex-direction:column;
-            //align-items:center;
-            
         }
     }
 
@@ -826,31 +815,14 @@ const FormBar = styled.div`
             max-width:300px;
             max-height:60px;
             display:flex;
-            flex-direction: column;
-            // // grid-template-columns: repeat(2,50%);
-            // grid-template-areas: "image plan-name"
-            //                       "image price";
+            flex-direction: row;
+            align-items:center;
         }
 
-        .price-description-plan {
+        .plan-name, .price-description-plan {
             align-self:flex-end;
         }
     }
-
-    @media(max-width:375px){
-        .plan-option {
-            max-width:120px;
-        }
-
-        .plan-name {
-            align-self:flex-start;
-        }
-
-        .price-description-plan {
-            align-self:flex-start;
-        }
-    }
-
 `
 const SideBar = styled.div`
     display:flex;
