@@ -6,6 +6,7 @@ import styled from "styled-components";
 
 
 // Images
+import sideBarMobile from '../../assets/images/bg-sidebar-mobile.svg';
 import sideBar from '../../assets/images/bg-sidebar-desktop.svg'
 import arcadeIcon from '../../assets/images/icon-arcade.svg'
 import advancedIcon from '../../assets/images/icon-advanced.svg'
@@ -115,7 +116,11 @@ const Form = () => {
     return <Container>
         <FormCard className="main-box">
             <SideBar className="sidebar">
-                <img src={sideBar} alt="Side bar" />
+                <picture>
+                    <source srcSet={sideBarMobile} media="(max-width:425px)" />
+                    <img src={sideBar} alt="Side bar" />
+                </picture>
+
                 <div className="steps">
                     <div className="step">
                         <p className={`${formInfo.stepActive === 1 ? 'numbers active' : 'numbers'}`}>1</p>
@@ -145,10 +150,6 @@ const Form = () => {
                             <p className="step-name">STEP 4</p><p className="description-step">SUMMARY</p>
                         </div>
                     </div>
-
-                </div>
-                <div className="image-side">
-
 
                 </div>
             </SideBar>
@@ -337,7 +338,7 @@ const Form = () => {
                     </div>
                 </div>
             </FormBar>
-            <div className="form-navigation">
+            <FormNav className="form-navigation">
                 <button className={`btn-nav ${formInfo.stepActive === 1 ? 'btn-backstep disabled' : 'btn-backstep'}`} onClick={(e) => {
                     e.preventDefault();
                     handleBackStep();
@@ -347,7 +348,7 @@ const Form = () => {
                     e.preventDefault();
                     handleNextStep();
                 }}>{formInfo.stepActive === 4 ? 'Confirm' : 'Next step'}</button>
-            </div>
+            </FormNav>
         </FormCard>
     </Container >
 }
@@ -359,6 +360,8 @@ const Container = styled.section`
     justify-content:center;
     align-items:center;
     background-color:lightgrey;
+
+    
 `
 const FormCard = styled.div`
     display:grid;
@@ -410,53 +413,27 @@ const FormCard = styled.div`
         z-index:1;
     }
 
-    .btn-nav {
-        border-radius:7px;
-        border:0;
-        font-size:14px;
-        font-weight:bold;
-        width:100px;
-        height:40px;
-    }
 
-    .btn-nextstep {
-        width:100px;
-        height:40px;
-        background-color:#1d2e54;
-        color:white;
-        align-self:flex-end;
-    }
+    @media(max-width:425px){
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "side-bar"
+            "form"
+            "navigation";
+        height:100vh;
+        background-color: initial;
 
-    .btn-backstep {
-    
-    }
+        .form {
+            max-width:380px;
+            justify-self:center;
+            background-color:white;
+            border-radius:10px;
+            top:-20%;
+        }
 
-    .color-change {
-        background-color:blue;
-    }
-
-    .btn-nextstep.color-change:hover {
-        background-color:#3333FF;
-    }
-
-    .btn-nextstep:hover {
-        background-color:#41527C;
-        border-radius7px;
-    }
-
-    .btn-backstep {
-        align-self:self-end;
-        background-color:white;
-        color:lightgrey;
-    }
-
-    .btn-backstep:hover {
-        color:#1E147A;
-    }
-
-    .btn-backstep.disabled {
-        opacity:0;
-        pointer-events:none;
+        .form-navigation {
+            background-color:white;
+        }
     }
 `
 const FormBar = styled.div`
@@ -561,7 +538,6 @@ const FormBar = styled.div`
         flex-direction:column;
         box-sizing:border-box;
         justify-content:space-between;
-        //align-items:center;
     }
 
     .plan-option.checked {
@@ -595,8 +571,6 @@ const FormBar = styled.div`
         grid-area: price;
     }
 
-    
-
     .plan-duration {
         display:flex;
         max-width:400px;
@@ -616,7 +590,6 @@ const FormBar = styled.div`
         margin: 0 20px;
         width:51px;
         height:25px;
-        //align-self:center;
         position:relative;
         display:flex;
     }
@@ -804,7 +777,6 @@ const FormBar = styled.div`
     }
 
     @media(max-width:768px){
-
         .select-plan-description{
             flex-direction:column;
         }
@@ -823,6 +795,67 @@ const FormBar = styled.div`
             align-self:flex-end;
         }
     }
+
+    @media(max-width:425px){
+
+        .title-description {
+            margin-top:20px;
+        }
+    }
+`
+const FormNav = styled.div`
+    z-index:0;
+
+
+    .btn-nav {
+        border-radius:7px;
+        border:0;
+        font-size:14px;
+        font-weight:bold;
+        width:100px;
+        height:40px;
+    }
+
+    .btn-nextstep {
+        width:100px;
+        height:40px;
+        background-color:#1d2e54;
+        color:white;
+        align-self:flex-end;
+    }
+
+    .btn-backstep {
+
+    }
+
+    .color-change {
+        background-color:blue;
+    }
+
+    .btn-nextstep.color-change:hover {
+        background-color:#3333FF;
+    }
+
+    .btn-nextstep:hover {
+        background-color:#41527C;
+        border-radius7px;
+    }
+
+    .btn-backstep {
+        align-self:self-end;
+        background-color:white;
+        color:lightgrey;
+    }
+
+    .btn-backstep:hover {
+        color:#1E147A;
+    }
+
+    .btn-backstep.disabled {
+        opacity:0;
+        pointer-events:none;
+    }
+
 `
 const SideBar = styled.div`
     display:flex;
@@ -832,14 +865,19 @@ const SideBar = styled.div`
     max-width:100%;
     position:relative;
 
-    img {
-        //align-self:center;
+    picture {
+        display:flex;
+        width:100%;
+        justify-content:center;
+    }
+
+    picture img {
         max-width:240px;
         width:100%;
-        height:540px;
-        //position:relative;
+        height:auto;
         object-fit:cover;
         border-radius:10px;
+        align-self:center;
     }
 
     .steps {
@@ -851,12 +889,7 @@ const SideBar = styled.div`
         word-break:break-all;
         width:75%;
         top:20%;
-        // left:15%;
         gap:10px;
-    }
-
-    img, .steps {
-        align-self:center;
     }
 
     .step {
@@ -893,9 +926,38 @@ const SideBar = styled.div`
         color:black;
     }
 
-    // .sidebar img {
-    //     margin-left:15px;
-    // }
+    @media(max-width:425px){
+        max-width:425px;
+
+        picture {
+            //align-items:initial;
+        }
+
+        picture img {
+            background-size:cover;            
+            width:100%;
+            max-width:425px;
+            max-height:240px;
+            height:100%;
+            align-self:initial;
+            border-radius:initial;
+        }
+
+        .step-content{
+            display:none;
+        }
+
+        .steps {
+            gap:10px;
+            flex-direction:row;
+            justify-content:center;
+        }
+
+        .numbers {
+            margin: 0;
+            
+        }
+    }
 `
 
 export default (Form)

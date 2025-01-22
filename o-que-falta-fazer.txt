@@ -17,7 +17,9 @@
 
 - Tamanho das fontes - OK;
 
+
+
+- Responsividade Mobile; - OK
+
 - Restante:
-
-
-- Responsividade Mobile; 
+- Tela de Submit!
