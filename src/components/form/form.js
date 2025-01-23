@@ -1,5 +1,5 @@
 //
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import styled from "styled-components";
 
@@ -7,15 +7,17 @@ import styled from "styled-components";
 
 // Images
 import sideBarMobile from '../../assets/images/bg-sidebar-mobile.svg';
-import sideBar from '../../assets/images/bg-sidebar-desktop.svg'
-import arcadeIcon from '../../assets/images/icon-arcade.svg'
-import advancedIcon from '../../assets/images/icon-advanced.svg'
-import proIcon from '../../assets/images/icon-pro.svg'
+import sideBar from '../../assets/images/bg-sidebar-desktop.svg';
+import arcadeIcon from '../../assets/images/icon-arcade.svg';
+import advancedIcon from '../../assets/images/icon-advanced.svg';
+import proIcon from '../../assets/images/icon-pro.svg';
+import thankYouIcon from '../../assets/images/icon-thank-you.svg';
 
 
 const Form = () => {
 
     const { register, handleSubmit, formState: { errors }, getValues } = useForm();
+    const formRef = useRef(null);
 
     const [formInfo, setFormInfo] = useState({
         stepActive: 1,
@@ -32,14 +34,14 @@ const Form = () => {
 
     const handleNextStep = () => {
         if (formInfo.stepActive === 1) {
-            //Validar forms
-            handleSubmit(handleSubmitForm())
-
+            console.log('To aqui: ');
+            const verificarTipo = formRef.current.requestSubmit();
+            console.log(verificarTipo);
+            //setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
         } else if (formInfo.stepActive === 4) {
 
             console.log('Formulário enviado');
-            console.log(formInfo);
-            console.log(getValues());
+            setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
         } else {
             setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
         }
@@ -106,9 +108,8 @@ const Form = () => {
     }
 
     const handleSubmitForm = () => {
-        // Opcional: estruturar um objeto contendo a informação do react-hook-form com o state.
-        console.log('Formulário registrado no react-hook-form');
-
+        console.log('to aqui\nObjeto - handleSubmitForm:', getValues());
+        // Aqui pode-se fazer uma lógica de persistência de dados;
         setFormInfo((prevState) => ({ ...prevState, stepActive: formInfo.stepActive + 1 }));
     }
 
@@ -145,7 +146,7 @@ const Form = () => {
                     </div>
                     <br />
                     <div className="step">
-                        <p className={`${formInfo.stepActive === 4 ? 'numbers active' : 'numbers'}`}>4</p>
+                        <p className={`${formInfo.stepActive === 4 || formInfo.stepActive === 5 ? 'numbers active' : 'numbers'}`}>4</p>
                         <div className="step-content">
                             <p className="step-name">STEP 4</p><p className="description-step">SUMMARY</p>
                         </div>
@@ -159,7 +160,7 @@ const Form = () => {
                     <h1 className="title-description">Personal info</h1>
                     <h3 className="subtitle-description">Please, provide your name, email adress and phone number.</h3>
 
-                    <form onSubmit={handleSubmit(handleSubmitForm)}>
+                    <form ref={formRef} onSubmit={handleSubmit(handleSubmitForm)}>
                         <label htmlFor="name" className="name description-field">Name {errors.name && <p>{errors.name.message}</p>}</label>
                         <input
                             type="text"
@@ -199,7 +200,6 @@ const Form = () => {
                             }
                         />
                     </form>
-
                 </div>
                 <div key='2' className={`select-plan ${formInfo.stepActive === 2 ? 'form-step enabled' : 'form-step disabled'}`}>
                     <h1 className="title-description">Select Plan</h1>
@@ -337,8 +337,16 @@ const Form = () => {
                         <p className="total-price-billing">${formInfo.addons.length > 0 ? formInfo.addons.reduce((acc, addon) => acc + addon.price, 0) + formInfo.selectedPlan.price : formInfo.selectedPlan.price}{formInfo.planDuration ? '/yr' : '/mo'}</p>
                     </div>
                 </div>
+                <div key='5' className={`success-subscription ${formInfo.stepActive === 5 ? 'form-step enabled' : 'form-step disabled'}`}>
+                    <picture>
+                        <source srcSet=""/>
+                        <img src={thankYouIcon} alt="Thank you"/>
+                    </picture>
+                    <h1 className="title-description">Thank you!</h1>
+                    <h3 className="subtitle-description">Thanks for confirming your subscription. We hope you have fun using our platform. If you ever need support, please feel free to email us at support@loremgaming.com.</h3>
+                </div>
             </FormBar>
-            <FormNav className="form-navigation">
+            <FormNav className={`form-navigation ${formInfo.stepActive === 5 ? 'disabled':''}`}>
                 <button className={`btn-nav ${formInfo.stepActive === 1 ? 'btn-backstep disabled' : 'btn-backstep'}`} onClick={(e) => {
                     e.preventDefault();
                     handleBackStep();
@@ -389,9 +397,12 @@ const FormCard = styled.div`
         top:10%;
     }
 
-    .your-info, .select-plan, .add-ons, .summary {
+    .your-info, .select-plan, .add-ons, .summary, .success-subscription {
         max-width:400px;
         width:100%;
+        display:flex;
+        //margin: 10px 0;
+        
     }
 
     .form-step.enabled{
@@ -411,6 +422,10 @@ const FormCard = styled.div`
         padding:15px 20px;
         box-sizing:border-box;
         z-index:1;
+    }
+
+    .form-navigation.disabled {
+        display:none;
     }
 
 
@@ -446,7 +461,7 @@ const FormBar = styled.div`
         align-items:center;
         justify-content:space-between;
         padding: 3px 0;
-        margin-top:15px;
+        //margin-top:15px;
     }
 
     label.description-field p{
@@ -465,7 +480,7 @@ const FormBar = styled.div`
         color:#B6B6B6;
         font-size:14px;
         font-weight:normal;
-        margin:20px 0;
+        //margin:20px 0;
     }
 
     .field {
@@ -517,7 +532,7 @@ const FormBar = styled.div`
         display:flex;
         flex-wrap:wrap;
         //justify-content:center;
-        gap:20px;
+        //gap:20px;
         align-items:center;
     }
 
@@ -635,6 +650,11 @@ const FormBar = styled.div`
         width:100%;
     }
 
+    .addons-description {
+        display:flex;
+        flex-direction:column;
+    }
+
     .add-on-option {
         width:100%;
         min-height:80px;
@@ -647,7 +667,7 @@ const FormBar = styled.div`
         font-size:18px;
         border: 1px solid lightgrey;
         border-radius:10px;
-        margin-top:15px;
+        //margin-top:15px;
         cursor:pointer;
         transition:border 0.2s ease-in-out;
         box-sizing:border-box;
@@ -742,7 +762,6 @@ const FormBar = styled.div`
     .other-services {
         display:flex;
         flex-direction:column;
-        margin-top:20px;
         border-top: 1px solid black;
     }
 
@@ -761,9 +780,12 @@ const FormBar = styled.div`
     }
 
     .total-billing {
-        padding:20px;
+        position:relative;
+        //top:20%;
         display:flex;
         justify-content:space-between;
+        align-items:center;
+        padding: 0 20px;
     }
 
     .total-billing .total-billing-type {
@@ -774,6 +796,33 @@ const FormBar = styled.div`
         color:blue;
         font-size:22px;
         font-family:'Ubuntu Bold';
+    }
+
+    .success-subscription {
+        //align-self:center;
+        position:relative;
+        top:40%;
+    }
+
+    .success-subscription picture {
+        display:flex;
+        width:100%;
+        justify-content:center;
+        margin-bottom: 20px;
+    }
+
+    .success-subscription .subtitle-description {
+        font-size:18px;
+    }
+
+    .success-subscription .title-description, .success-subscription .subtitle-description {
+        text-align:center;
+    }
+
+    .your-info form, .select-plan .select-plan-description, .add-ons .addons-description, .summary .summary-description {
+        //margin-top:100px;
+        position:relative;
+        //top:10%;
     }
 
     @media(max-width:768px){
@@ -799,7 +848,11 @@ const FormBar = styled.div`
     @media(max-width:425px){
 
         .title-description {
-            margin-top:20px;
+            //margin-top:20px;
+        }
+
+        .success-subscription {
+            top:10%;
         }
     }
 `

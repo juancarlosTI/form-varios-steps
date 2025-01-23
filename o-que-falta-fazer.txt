@@ -1,4 +1,4 @@
-- Responsividade mobile - WIP
+- Responsividade mobile - OK
 - Form 1 - OK
 - Form 2 - Items (planos) tem um tamanho muito grande; - OK
 - Form 3 - Items (addons) ultrapassam o tamanho do container pai; - OK
@@ -17,9 +17,7 @@
 
 - Tamanho das fontes - OK;
 
-
-
-- Responsividade Mobile; - OK
-
 - Restante:
 - Tela de Submit!
+- Padding's que tem uma função de espaçamento atrapalham a responsividade mobile; (Forms, Summary e Plans);
+- Margin-TOP (Add-ons);
