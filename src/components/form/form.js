@@ -369,6 +369,10 @@ const Container = styled.section`
     align-items:center;
     background-color:lightgrey;
 
+    @media(max-width:425px){
+        max-width:425px;
+    }
+
     
 `
 const FormCard = styled.div`
@@ -401,7 +405,7 @@ const FormCard = styled.div`
         max-width:400px;
         width:100%;
         display:flex;
-        //margin: 10px 0;
+        margin-top: 20px;
         
     }
 
@@ -430,7 +434,9 @@ const FormCard = styled.div`
 
 
     @media(max-width:425px){
+        max-width:425px;
         grid-template-columns: 1fr;
+        grid-template-rows: 25% 65% 10%;
         grid-template-areas: 
             "side-bar"
             "form"
@@ -443,11 +449,13 @@ const FormCard = styled.div`
             justify-self:center;
             background-color:white;
             border-radius:10px;
-            top:-20%;
+            position:absolute;
+            top:15%;
         }
 
         .form-navigation {
             background-color:white;
+            padding:10px 20px;
         }
     }
 `
@@ -455,13 +463,16 @@ const FormBar = styled.div`
     font-family:'Ubuntu';
     color:#1E147A;
     
+    .your-info form {
+        display:flex;
+        flex-direction:column;
+    }
 
     label.description-field {
         display:flex;
         align-items:center;
         justify-content:space-between;
         padding: 3px 0;
-        //margin-top:15px;
     }
 
     label.description-field p{
@@ -480,7 +491,7 @@ const FormBar = styled.div`
         color:#B6B6B6;
         font-size:14px;
         font-weight:normal;
-        //margin:20px 0;
+        margin:20px 0;
     }
 
     .field {
@@ -495,6 +506,7 @@ const FormBar = styled.div`
         width:100%;
         text-indent:10px;
         border-color:#B6B6B6;
+        margin-bottom:15px;
     }
 
     .field:focus {
@@ -532,7 +544,8 @@ const FormBar = styled.div`
         display:flex;
         flex-wrap:wrap;
         //justify-content:center;
-        //gap:20px;
+        gap:20px;
+        width:100%;
         align-items:center;
     }
 
@@ -541,7 +554,7 @@ const FormBar = styled.div`
         min-width:70px;
         width:100%;
         max-height:180px;
-        height:180px;
+        height:150px;
         flex: 1 1 0;
         background-color:white;
         color:black;
@@ -653,6 +666,8 @@ const FormBar = styled.div`
     .addons-description {
         display:flex;
         flex-direction:column;
+        gap:20px;
+        
     }
 
     .add-on-option {
@@ -667,7 +682,6 @@ const FormBar = styled.div`
         font-size:18px;
         border: 1px solid lightgrey;
         border-radius:10px;
-        //margin-top:15px;
         cursor:pointer;
         transition:border 0.2s ease-in-out;
         box-sizing:border-box;
@@ -763,6 +777,7 @@ const FormBar = styled.div`
         display:flex;
         flex-direction:column;
         border-top: 1px solid black;
+        margin-top:15px;
     }
 
     .other-services .service {
@@ -820,24 +835,19 @@ const FormBar = styled.div`
     }
 
     .your-info form, .select-plan .select-plan-description, .add-ons .addons-description, .summary .summary-description {
-        //margin-top:100px;
-        position:relative;
-        //top:10%;
-    }
-
-    @media(max-width:768px){
-        .select-plan-description{
-            flex-direction:column;
-        }
     }
 
     @media(max-width:768px){
         .plan-option {
-            max-width:300px;
+            max-width:100%;
             max-height:60px;
             display:flex;
             flex-direction: row;
             align-items:center;
+        }
+
+        .select-plan-description{
+            flex-direction:column;
         }
 
         .plan-name, .price-description-plan {
@@ -846,6 +856,24 @@ const FormBar = styled.div`
     }
 
     @media(max-width:425px){
+
+        .plan-name, .price-description-plan {
+            align-self: flex-start;
+        }
+
+        .select-plan-description {
+            gap:10px;
+        }
+
+        .plan-option {
+            justify-content:initial;
+            gap:20px;
+            padding:10px;
+        }
+
+        .field {
+            padding:0;
+        }
 
         .title-description {
             //margin-top:20px;
@@ -981,6 +1009,7 @@ const SideBar = styled.div`
 
     @media(max-width:425px){
         max-width:425px;
+        max-height:240px;
 
         picture {
             //align-items:initial;
